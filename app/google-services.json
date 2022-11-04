@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "639285342002",
+    "project_id": "exporeal-754d8",
+    "storage_bucket": "exporeal-754d8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639285342002:android:6b1a14cbcd87d21f89f12b",
+        "android_client_info": {
+          "package_name": "com.bcc.exporeal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639285342002-c1etcl5jfj9p4iqdp5brpaa8q2hh74dv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKac7vvkwPcDSUmDAMzKklvcZJwsrVbfQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639285342002-c1etcl5jfj9p4iqdp5brpaa8q2hh74dv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

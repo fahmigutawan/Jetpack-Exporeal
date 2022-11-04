@@ -1,0 +1,15 @@
+package com.bcc.exporeal.viewmodel
+
+import androidx.lifecycle.ViewModel
+import com.bcc.exporeal.repository.AppRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class MySplashViewModel @Inject constructor(
+    private val repo:AppRepository
+) :ViewModel(){
+    fun hasPassedLandingScreen() = repo.hasPassedLandingScreen
+
+    fun isLoggedIn() = repo.isLoggedIn()
+}
