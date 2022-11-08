@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -13,10 +14,11 @@ class GetResponse @Inject constructor(
     val connectivityCheck: ConnectivityCheck
 ) {
     inline fun <reified Y> getFirestoreResponse(
+        timeDelay:Long = 3000L,
         crossinline block: suspend () -> Task<DocumentSnapshot>
     ): Flow<Resource<Y>?> = flow {
         emit(Resource.Loading())
-//        delay(2500)
+        delay(timeDelay)
         if (!connectivityCheck.isConnectedToInternet()) {
             emit(Resource.Error("Check your Connection"))
             return@flow
@@ -33,10 +35,11 @@ class GetResponse @Inject constructor(
         }
     }
     inline fun <reified Y> getFirestoreListResponse(
+        timeDelay: Long = 3000L,
         crossinline block: suspend () -> Task<QuerySnapshot>
     ): Flow<Resource<List<Y>>?> = flow {
         emit(Resource.Loading())
-//        delay(2500)
+        delay(timeDelay)
         if (!connectivityCheck.isConnectedToInternet()) {
             emit(Resource.Error("Check your Connection"))
             return@flow

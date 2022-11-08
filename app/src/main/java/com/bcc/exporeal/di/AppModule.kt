@@ -13,11 +13,42 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.*
+import io.ktor.client.engine.android.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.features.logging.*
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun provideKtorCLient(): HttpClient {
+        val json = kotlinx.serialization.json.Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            encodeDefaults = false
+        }
+
+        return HttpClient(Android){
+            install(Logging) {
+                logger = Logger.ANDROID
+                level = LogLevel.HEADERS
+            }
+            install(HttpTimeout) { // Timeout
+                requestTimeoutMillis = 15000L
+                connectTimeoutMillis = 3000L
+                socketTimeoutMillis = 15000L
+            }
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(json)
+            }
+        }
+    }
+
     @Provides
     @Singleton
     fun provideFirebaseAuth() = FirebaseAuth.getInstance()
@@ -54,6 +85,7 @@ object AppModule {
         firestoreDb: FirebaseFirestore,
         storage: FirebaseStorage,
         auth: FirebaseAuth,
-        getResponse: GetResponse
-    ) = AppRepository(context, realtimeDb, firestoreDb, storage, auth, getResponse)
+        getResponse: GetResponse,
+        httpClient: HttpClient
+    ) = AppRepository(context, realtimeDb, firestoreDb, storage, auth, getResponse, httpClient)
 }

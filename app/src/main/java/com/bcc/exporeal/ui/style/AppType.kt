@@ -10,27 +10,27 @@ import com.bcc.exporeal.R
 object AppType {
     fun h1() = TextStyle(
         fontFamily = FontFamily(Font(R.font.worksans_semibold)),
-        fontSize = 36.sp
+        fontSize = 24.sp
     )
 
     fun h2() = TextStyle(
         fontFamily = FontFamily(Font(R.font.worksans_semibold)),
-        fontSize = 32.sp
+        fontSize = 20.sp
     )
 
     fun h3() = TextStyle(
         fontFamily = FontFamily(Font(R.font.worksans_semibold)),
-        fontSize = 28.sp
+        fontSize = 18.sp
     )
 
     fun h4() = TextStyle(
         fontFamily = FontFamily(Font(R.font.worksans_semibold)),
-        fontSize = 24.sp
+        fontSize = 16.sp
     )
 
     fun h5() = TextStyle(
         fontFamily = FontFamily(Font(R.font.worksans_semibold)),
-        fontSize = 20.sp
+        fontSize = 14.sp
     )
 
     fun body1() = TextStyle(

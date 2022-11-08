@@ -2,17 +2,23 @@ package com.bcc.exporeal.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
-import com.bcc.exporeal.model.UserModel
+import com.bcc.exporeal.model.*
 import com.bcc.exporeal.util.GetResponse
+import com.bcc.exporeal.util.Resource
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserInfo
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Query
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import io.ktor.client.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -24,7 +30,8 @@ class AppRepository @Inject constructor(
     private val firestoreDb: FirebaseFirestore,
     private val storage: FirebaseStorage,
     private val auth: FirebaseAuth,
-    private val getResponse: GetResponse
+    private val getResponse: GetResponse,
+    private val httpClient: HttpClient
 ) {
     val datastore = context.datastore
 
@@ -54,6 +61,13 @@ class AppRepository @Inject constructor(
             .signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailed() }
+    }
+
+    // (AUTH) Logout
+    suspend fun logout(delay: Long = 2000L, afterDelay: () -> Unit) {
+        auth.signOut()
+        kotlinx.coroutines.delay(delay)
+        afterDelay()
     }
 
     // (AUTH & FIRESTORE) Register with email password
@@ -88,9 +102,10 @@ class AppRepository @Inject constructor(
     // (STORAGE & FIRESTORE) Save Profile Pict
     fun saveProfilePicture(
         uri: Uri,
+        user: UserModel,
         onSuccess: () -> Unit,
         onFailed: () -> Unit,
-        onProgress: (transferred:Long, total:Long) -> Unit
+        onProgress: (transferred: Long, total: Long) -> Unit
     ) {
         // Save to storage
         storage
@@ -102,7 +117,8 @@ class AppRepository @Inject constructor(
             }
             .addOnSuccessListener {
                 // Get image URL
-                it.storage
+                storage
+                    .reference
                     .child("profile_pic/${auth.currentUser?.uid}.png")
                     .downloadUrl
                     .addOnSuccessListener {
@@ -110,7 +126,11 @@ class AppRepository @Inject constructor(
                         firestoreDb
                             .collection("user")
                             .document(auth.currentUser?.uid ?: "")
-                            .set(it.toString())
+                            .set(
+                                user.copy(
+                                    profile_pic = it.toString()
+                                )
+                            )
                             .addOnSuccessListener { onSuccess() }
                             .addOnFailureListener { onFailed() }
                     }.addOnFailureListener {
@@ -121,4 +141,78 @@ class AppRepository @Inject constructor(
                 onFailed()
             }
     }
+
+    // (FIRESTORE) GET own userInfo
+    fun getOwnUserInfo(): Flow<Resource<UserModel>?> =
+        getResponse.getFirestoreResponse {
+            firestoreDb
+                .collection("user")
+                .document(auth.currentUser?.uid ?: "")
+                .get()
+        }
+
+    // (FIRESTORE) GET userInfo by UID
+    fun getUserInfoByUid(uid: String): Flow<Resource<UserModel>?> =
+        getResponse.getFirestoreResponse {
+            firestoreDb
+                .collection("user")
+                .document(uid)
+                .get()
+        }
+
+    // (FIRESTORE) GET banner
+    fun getHomeBanner(): Flow<Resource<List<BannerModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("banner")
+                .orderBy("url", com.google.firebase.firestore.Query.Direction.ASCENDING)
+                .get()
+        }
+
+    // (FIRESTORE) GET category
+    fun getCategories(): Flow<Resource<List<CategoryModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("category")
+                .orderBy("category_id", com.google.firebase.firestore.Query.Direction.ASCENDING)
+                .get()
+        }
+
+    // (FIRESTORE) GET category by category_id
+    fun getCategoryByCategoryId(category_id: String): Flow<Resource<CategoryModel>?> =
+        getResponse.getFirestoreResponse(timeDelay = 0) {
+            firestoreDb.collection("category").document(category_id).get()
+        }
+
+    // (FIRESTORE) GET list of 10 top products
+    fun getTop10Product(): Flow<Resource<List<ProductModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("product")
+                .orderBy("product_id", com.google.firebase.firestore.Query.Direction.ASCENDING)
+                .limit(10)
+                .get()
+        }
+
+    // (FIRESTORE) GET list of 2 top permintaan
+    fun getTop2Permintaan(): Flow<Resource<List<PermintaanModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("permintaan")
+                .orderBy(
+                    "permintaan_id",
+                    com.google.firebase.firestore.Query.Direction.ASCENDING
+                )
+                .limit(2)
+                .get()
+        }
+
+    // (FIRESTORE) GET list of product pictures
+    fun getProductPicturesByProductId(product_id:String):Flow<Resource<List<ProductPictureModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb.collection("product_picture")
+                .whereGreaterThanOrEqualTo("product_id", product_id)
+                .whereLessThanOrEqualTo("product_id", "$product_id\uF7FF")
+                .get()
+        }
 }

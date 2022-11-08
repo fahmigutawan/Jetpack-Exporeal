@@ -322,9 +322,7 @@ private fun RegisterAdvanceContent(
                                 onSuccess = {
                                     viewModel.isLoading.value = false
                                     navController.navigate(route = AppNavRoute.HomeScreen.name){
-                                        popUpTo(route = AppNavRoute.RegisterScreen.name){
-                                            inclusive = true
-                                        }
+                                        navController.backQueue.clear()
                                     }
                                 },
                                 onFailed = {

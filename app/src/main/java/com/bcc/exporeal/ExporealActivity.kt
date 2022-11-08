@@ -12,13 +12,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.navigation.compose.rememberNavController
+import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-lateinit var SnackbarListener: @Composable (word:String, state:MutableState<Boolean>) -> SnackbarData?
+lateinit var SnackbarListener: @Composable (word: String, state: MutableState<Boolean>) -> SnackbarData?
 
 @AndroidEntryPoint
 class ExporealActivity : ComponentActivity() {
+    @Inject
+    lateinit var repository: AppRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -44,7 +49,12 @@ class ExporealActivity : ComponentActivity() {
                 snackbarHostState.currentSnackbarData
             }
 
-            ExporealContent(navController = navController, mainViewModel = mainViewModel, scaffoldState = scaffoldState)
+            ExporealContent(
+                navController = navController,
+                mainViewModel = mainViewModel,
+                scaffoldState = scaffoldState,
+                repository = repository
+            )
         }
     }
 }

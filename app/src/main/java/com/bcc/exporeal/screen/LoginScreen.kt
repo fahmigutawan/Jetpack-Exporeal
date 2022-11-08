@@ -192,9 +192,7 @@ private fun LoginContent(
                                 onSuccess = {
                                     viewModel.isLoading.value = false
                                     navController.navigate(route = AppNavRoute.HomeScreen.name){
-                                        popUpTo(route = AppNavRoute.LoginScreen.name){
-                                            inclusive = true
-                                        }
+                                        navController.backQueue.clear()
                                     }
                                 },
                                 onFailed = {

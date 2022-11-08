@@ -54,12 +54,13 @@ fun AppButton(
         }
 
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .onSizeChanged {
                     contentWidth.value = with(localDensity) { it.width.toDp() }
                     contentHeight.value = with(localDensity) { it.height.toDp() }
                 }
-                .padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+            contentAlignment = contentAlignment
         ) {
             content()
         }
@@ -89,7 +90,8 @@ fun AppButton(
     borderColor: Color = Color.Unspecified,
     shape: Shape = RoundedCornerShape(8.dp),
     contentAlignment: Alignment = Alignment.Center,
-    text:String
+    text:String,
+    textColor:Color = AppColor.Neutral10
 ) {
     val contentHeight = remember { mutableStateOf(0.dp) }
     val contentWidth = remember { mutableStateOf(0.dp) }
@@ -108,14 +110,15 @@ fun AppButton(
         }
 
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .onSizeChanged {
                     contentWidth.value = with(localDensity) { it.width.toDp() }
                     contentHeight.value = with(localDensity) { it.height.toDp() }
                 }
-                .padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+            contentAlignment = contentAlignment
         ) {
-            AppText(text = text, textType = TextType.ButtonNormal, color = AppColor.Neutral10)
+            AppText(text = text, textType = TextType.ButtonNormal, color = textColor)
         }
 
         Box(modifier = modifier

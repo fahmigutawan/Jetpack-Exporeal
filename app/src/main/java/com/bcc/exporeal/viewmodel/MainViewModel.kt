@@ -12,5 +12,6 @@ class MainViewModel @Inject constructor(
     private val repo:AppRepository
 ) :ViewModel() {
     val showBottomBar = mutableStateOf(false)
+    val showTopBar = mutableStateOf(false)
     val currentRoute = mutableStateOf(AppNavRoute.MySplashScreen.name)
 }
