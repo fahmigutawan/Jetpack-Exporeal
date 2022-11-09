@@ -130,7 +130,8 @@ fun ProductItemLoading() {
                         .placeholder(
                             visible = true,
                             color = AppColor.Neutral50,
-                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                            shape = RoundedCornerShape(4.dp)
                         ),
                     text = "The Product Name",
                     textType = TextType.Body3,
@@ -144,7 +145,8 @@ fun ProductItemLoading() {
                     .placeholder(
                         visible = true,
                         color = AppColor.Neutral50,
-                        highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                        highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                        shape = RoundedCornerShape(4.dp)
                     ),
                 text = "Rp25000",
                 textType = TextType.Body3,
@@ -237,12 +239,11 @@ fun PermintaanItem(
                         AsyncImage(
                             modifier = Modifier
                                 .height(34.dp)
-                                .widthIn(min = 68.dp, max = 72.dp)
                                 .clip(RoundedCornerShape(4.dp))
                                 .border(
                                     width = 1.dp,
                                     shape = RoundedCornerShape(4.dp),
-                                    color = AppColor.Neutral60
+                                    color = AppColor.Neutral30
                                 ),
                             model = "https://countryflagsapi.com/png/${permintaanModel.flag_id ?: ""}",
                             contentDescription = "Flag"
@@ -400,7 +401,7 @@ fun PermintaanItemLoading() {
                         .height(72.dp)
                         .fillMaxWidth()
                         .weight(1f),
-                    verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     // Kategori & Flag
                     Row(
@@ -414,7 +415,8 @@ fun PermintaanItemLoading() {
                             modifier = Modifier.placeholder(
                                 visible = true,
                                 color = AppColor.Neutral50,
-                                highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                                highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                shape = RoundedCornerShape(4.dp)
                             )
                         )
 
@@ -441,10 +443,11 @@ fun PermintaanItemLoading() {
                         modifier = Modifier.placeholder(
                             visible = true,
                             color = AppColor.Neutral50,
-                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                            shape = RoundedCornerShape(4.dp)
                         ),
                         text = "Product Name",
-                        textType = TextType.Body1,
+                        textType = TextType.Body3,
                         color = AppColor.Neutral100
                     )
 
@@ -453,7 +456,8 @@ fun PermintaanItemLoading() {
                         modifier = Modifier.placeholder(
                             visible = true,
                             color = AppColor.Neutral50,
-                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                            shape = RoundedCornerShape(4.dp)
                         ),
                         text = "Username",
                         textType = TextType.Body3,
@@ -484,7 +488,8 @@ fun PermintaanItemLoading() {
                         modifier = Modifier.placeholder(
                             visible = true,
                             color = AppColor.Neutral50,
-                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                            shape = RoundedCornerShape(4.dp)
                         ),
                         text = "RpHarga1 - RpHarga2",
                         textType = TextType.Body3,
@@ -533,7 +538,8 @@ fun PermintaanItemLoading() {
                     modifier = Modifier.placeholder(
                         visible = true,
                         color = AppColor.Neutral50,
-                        highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                        highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                        shape = RoundedCornerShape(4.dp)
                     ),
                     text = "Tanggal permintaan",
                     textType = TextType.Body3,

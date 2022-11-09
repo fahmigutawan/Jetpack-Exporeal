@@ -165,7 +165,11 @@ fun ExporealNavHost(
         }
 
         composable(route = AppNavRoute.HomeScreen.name) {
-            HomeScreen(navController = navController, repository = repository)
+            HomeScreen(
+                navController = navController,
+                repository = repository,
+                mainViewModel = mainViewModel
+            )
         }
 
         composable(route = AppNavRoute.MarketScreen.name) {
@@ -182,6 +186,14 @@ fun ExporealNavHost(
 
         composable(route = AppNavRoute.BusinessRegistrationScreen.name) {
             BusinessRegisterScreen(navController = navController)
+        }
+
+        composable(route = AppNavRoute.ProductDetailScreen.name) {
+            ProductDetailScreen(navController = navController, mainViewModel = mainViewModel)
+        }
+
+        composable(route = AppNavRoute.PermintaanDetailScreen.name){
+            PermintaanDetailScreen(navController = navController, mainViewModel = mainViewModel)
         }
     }
 }

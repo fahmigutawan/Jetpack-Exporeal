@@ -9,5 +9,7 @@ enum class AppNavRoute {
     MarketScreen,
     PelatihanScreen,
     ProfileScreen,
-    BusinessRegistrationScreen
+    BusinessRegistrationScreen,
+    ProductDetailScreen,
+    PermintaanDetailScreen
 }

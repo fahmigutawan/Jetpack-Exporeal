@@ -14,7 +14,7 @@ class GetResponse @Inject constructor(
     val connectivityCheck: ConnectivityCheck
 ) {
     inline fun <reified Y> getFirestoreResponse(
-        timeDelay:Long = 3000L,
+        timeDelay:Long = 2500L,
         crossinline block: suspend () -> Task<DocumentSnapshot>
     ): Flow<Resource<Y>?> = flow {
         emit(Resource.Loading())
@@ -35,7 +35,7 @@ class GetResponse @Inject constructor(
         }
     }
     inline fun <reified Y> getFirestoreListResponse(
-        timeDelay: Long = 3000L,
+        timeDelay: Long = 2500L,
         crossinline block: suspend () -> Task<QuerySnapshot>
     ): Flow<Resource<List<Y>>?> = flow {
         emit(Resource.Loading())

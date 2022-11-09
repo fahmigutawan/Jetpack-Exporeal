@@ -32,11 +32,13 @@ import coil.compose.AsyncImage
 import com.bcc.exporeal.R
 import com.bcc.exporeal.component.*
 import com.bcc.exporeal.model.*
+import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.util.CategoryItems
 import com.bcc.exporeal.util.Resource
 import com.bcc.exporeal.viewmodel.HomeViewModel
+import com.bcc.exporeal.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -50,7 +52,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun HomeScreen(
     navController: NavController,
-    repository: AppRepository
+    repository: AppRepository,
+    mainViewModel: MainViewModel
 ) {
     /**Attrs*/
     val viewModel = hiltViewModel<HomeViewModel>()
@@ -60,19 +63,23 @@ fun HomeScreen(
     val top2Permintaan = viewModel.top2Permintaan.collectAsState()
 
     /**Function*/
-    if(top2Permintaan.value is Resource.Success){
-        LaunchedEffect(key1 = true){
-            for (i in 0..top2Permintaan.value!!.data!!.size -1){
-                viewModel.listOfUserInfo.add(Resource.Loading())
+    if (top2Permintaan.value is Resource.Success) {
+        LaunchedEffect(key1 = true) {
+            if (viewModel.listOfUserInfo.size != top2Permintaan.value?.data?.size) {
+                for (i in 0..top2Permintaan.value!!.data!!.size - 1) {
+                    viewModel.listOfUserInfo.add(Resource.Loading())
+                }
             }
         }
-        LaunchedEffect(key1 = true){
-            for (i in 0..top2Permintaan.value!!.data!!.size -1){
-                viewModel.listOfCategory.add(Resource.Loading())
+        LaunchedEffect(key1 = true) {
+            if (viewModel.listOfCategory.size != top2Permintaan.value?.data?.size) {
+                for (i in 0..top2Permintaan.value!!.data!!.size - 1) {
+                    viewModel.listOfCategory.add(Resource.Loading())
+                }
             }
         }
 
-        LaunchedEffect(key1 = true){
+        LaunchedEffect(key1 = true) {
             top2Permintaan.value!!.data?.forEachIndexed { index, item ->
                 viewModel.getCategoryById(
                     category_id = item.category_id ?: "",
@@ -102,6 +109,7 @@ fun HomeScreen(
         navController = navController,
         repository = repository,
         viewModel = viewModel,
+        mainViewModel = mainViewModel,
         banner = banner,
         category = category,
         top10Product = top10Product,
@@ -115,6 +123,7 @@ private fun HomeContent(
     navController: NavController,
     repository: AppRepository,
     viewModel: HomeViewModel,
+    mainViewModel: MainViewModel,
     banner: State<Resource<List<BannerModel>>?>,
     category: State<Resource<List<CategoryModel>>?>,
     top10Product: State<Resource<List<ProductModel>>?>,
@@ -342,7 +351,10 @@ private fun HomeContent(
                                 ProductItem(
                                     productModel = it,
                                     onClick = {
-                                        /*TODO*/
+                                        mainViewModel.pickedProductToProductDetailScreen.value = it
+                                        if (mainViewModel.pickedProductToProductDetailScreen.value != null) {
+                                            navController.navigate(route = AppNavRoute.ProductDetailScreen.name)
+                                        }
                                     }
                                 )
                             }
@@ -382,17 +394,22 @@ private fun HomeContent(
 
             }
             is Resource.Loading -> {
-                items(2){
+                items(2) {
                     PermintaanItemLoading()
                 }
             }
             is Resource.Success -> {
                 itemsIndexed(top2Permintaan.value?.data!!) { index, item ->
-                    if(viewModel.listOfUserInfo.size == top2Permintaan.value?.data?.size
+                    if (viewModel.listOfUserInfo.size == top2Permintaan.value?.data?.size
                         && viewModel.listOfCategory.size == top2Permintaan.value?.data?.size
-                    ){
+                    ) {
                         PermintaanItem(
-                            onDetailClicked = { /*TODO*/ },
+                            onDetailClicked = {
+                                mainViewModel.pickedPermintaanToPermintaanDetailScreen.value = item
+                                if (mainViewModel.pickedPermintaanToPermintaanDetailScreen.value != null) {
+                                    navController.navigate(route = AppNavRoute.PermintaanDetailScreen.name)
+                                }
+                            },
                             permintaanModel = item,
                             userInfo = viewModel.listOfUserInfo[index],
                             category = viewModel.listOfCategory[index]
@@ -400,11 +417,12 @@ private fun HomeContent(
                     }
                 }
             }
-            null -> { /*TODO*/ }
+            null -> { /*TODO*/
+            }
         }
-        
+
         // spacer
-        item{
+        item {
             Spacer(modifier = Modifier.height(16.dp))
         }
     }

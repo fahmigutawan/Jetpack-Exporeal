@@ -10,27 +10,31 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.ui.style.AppType
 
 @Composable
 fun AppTextInputField(
     modifier: Modifier = Modifier.fillMaxWidth(),
-    height: Dp = 42.dp,
+    textPadding: Dp = 12.dp,
     placeHolderText: String,
     placeHolderColor: Color = AppColor.Neutral50,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    textStyle: TextStyle = AppType.body1(),
+    textStyle: TextStyle = AppType.body3(),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = true,
@@ -41,9 +45,12 @@ fun AppTextInputField(
     valueState: MutableState<String>,
     backgroundColor: Color = AppColor.Neutral10
 ) {
+    val containerHeight = remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+
     Box(
         modifier = modifier
-            .height(height)
+            .heightIn(min = containerHeight.value)
             .border(width = 1.dp, color = AppColor.Neutral50, shape = RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor),
@@ -53,7 +60,7 @@ fun AppTextInputField(
             value = valueState.value,
             onValueChange = { valueState.value = it },
             modifier = Modifier
-                .padding(10.dp)
+                .padding(textPadding)
                 .fillMaxWidth(),
             enabled = enabled,
             readOnly = readOnly,
@@ -64,19 +71,25 @@ fun AppTextInputField(
             maxLines = maxLines,
             visualTransformation = visualTransformation
         ) { field ->
-            Box(contentAlignment = Alignment.CenterStart) {
+            Box(
+                modifier = Modifier.onSizeChanged {
+                    with(density) {
+                        containerHeight.value = it.height.toDp()
+                    }
+                },
+                contentAlignment = Alignment.CenterStart
+            ) {
                 field()
                 if (valueState.value.isEmpty()) AppText(
                     text = placeHolderText,
-                    textType = TextType.FieldPlaceholder,
+                    textType = TextType.Body3,
                     color = placeHolderColor
                 )
             }
         }
         Box(
             modifier = modifier
-                .fillMaxHeight()
-                .padding(10.dp)
+                .padding(horizontal = textPadding)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -87,7 +100,6 @@ fun AppTextInputField(
                     leading()
                     Spacer(modifier = Modifier.width(8.dp))
                 }
-
                 endContent?.let { end ->
                     Spacer(modifier = Modifier.width(8.dp))
                     end()

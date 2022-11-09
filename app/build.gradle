@@ -112,6 +112,9 @@ dependencies {
 
     // Kotlin serializer
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
+
+    // Icons Extended
+    implementation "androidx.compose.material:material-icons-extended:1.2.1"
 }
 
 kapt {
