@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bcc.exporeal.model.BusinessModel
 import com.bcc.exporeal.model.UserModel
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.util.Resource
@@ -22,6 +23,8 @@ class ProfileViewModel @Inject constructor(
     val showErrorChangeProfilePicSnackbar = mutableStateOf(false)
     val showSuccessChangeProfilePicSnackbar = mutableStateOf(false)
     val showUploadProgressDialog = mutableStateOf(false)
+    val showIsLoadingSnackbar = mutableStateOf(false)
+    val showPleaseRefreshSnackbar = mutableStateOf(false)
     val profilePictureTotalProgress = mutableStateOf(1L)
     val profilePictureTransferredProgress = mutableStateOf(0L)
 
@@ -39,13 +42,36 @@ class ProfileViewModel @Inject constructor(
         uri, user, onSuccess, onFailed, onProgress
     )
 
+    fun refresh(){
+        viewModelScope.launch {
+            repository.getOwnUserInfo().collect {
+                _user.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            repository.getBusinessByUid().collect{
+                _business.value = it
+            }
+        }
+    }
+
     private val _user = MutableStateFlow<Resource<UserModel>?>(Resource.Loading())
     val user get() = _user
+
+    private val _business = MutableStateFlow<Resource<List<BusinessModel>>?>(Resource.Loading())
+    val business get() = _business
 
     init {
         viewModelScope.launch {
             repository.getOwnUserInfo().collect {
                 _user.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            repository.getBusinessByUid().collect{
+                _business.value = it
             }
         }
     }

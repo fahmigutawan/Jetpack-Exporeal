@@ -2,7 +2,7 @@ package com.bcc.exporeal.model
 
 data class ProductModel(
     val product_id:String? = null,
-    val product_count:String? = null,
+    val product_count:Int? = null,
     val product_name:String? = null,
     val product_description:String? = null,
     val product_price:String? = null,

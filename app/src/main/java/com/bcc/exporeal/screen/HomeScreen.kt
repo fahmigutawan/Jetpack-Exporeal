@@ -7,35 +7,25 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.bcc.exporeal.R
 import com.bcc.exporeal.component.*
 import com.bcc.exporeal.model.*
 import com.bcc.exporeal.navigation.AppNavRoute
-import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.ui.style.AppColor
-import com.bcc.exporeal.util.CategoryItems
 import com.bcc.exporeal.util.Resource
 import com.bcc.exporeal.viewmodel.HomeViewModel
 import com.bcc.exporeal.viewmodel.MainViewModel
@@ -46,13 +36,11 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
-import com.google.firebase.firestore.FirebaseFirestore
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     navController: NavController,
-    repository: AppRepository,
     mainViewModel: MainViewModel
 ) {
     /**Attrs*/
@@ -78,7 +66,6 @@ fun HomeScreen(
                 }
             }
         }
-
         LaunchedEffect(key1 = true) {
             top2Permintaan.value!!.data?.forEachIndexed { index, item ->
                 viewModel.getCategoryById(
@@ -107,7 +94,6 @@ fun HomeScreen(
     /**Content*/
     HomeContent(
         navController = navController,
-        repository = repository,
         viewModel = viewModel,
         mainViewModel = mainViewModel,
         banner = banner,
@@ -121,7 +107,6 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     navController: NavController,
-    repository: AppRepository,
     viewModel: HomeViewModel,
     mainViewModel: MainViewModel,
     banner: State<Resource<List<BannerModel>>?>,
@@ -265,45 +250,73 @@ private fun HomeContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                CategoryItems.values().forEach { item ->
-                    val itemHeight = remember { mutableStateOf(0.dp) }
-                    val itemWidth = remember { mutableStateOf(0.dp) }
+                when (category.value) {
+                    is Resource.Error -> {
 
-                    Box {
-                        Column(
-                            modifier = Modifier
-                                .onSizeChanged {
-                                    with(density) {
-                                        itemHeight.value = it.height.toDp()
-                                        itemWidth.value = it.width.toDp()
-                                    }
-                                },
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier.size(48.dp),
-                                model = item.iconId,
-                                contentDescription = "Icon"
-                            )
-
-                            AppText(
-                                text = item.word,
-                                textType = TextType.BottomMenu,
-                                color = AppColor.Blue60
-                            )
-
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(
-                                    width = itemWidth.value,
-                                    height = itemHeight.value
-                                )
-                                .clickable { /*TODO*/ }
-                        )
                     }
+                    is Resource.Loading -> {
+                        repeat(8) {
+                            Column(
+                                modifier = Modifier,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+//                                AsyncImage(
+//                                    modifier = Modifier.size(48.dp),
+//                                    model = item.iconId,
+//                                    contentDescription = "Icon"
+//                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .placeholder(
+                                            visible = true,
+                                            color = AppColor.Neutral50,
+                                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20)
+                                        )
+                                )
+
+                                AppText(
+                                    modifier = Modifier
+                                        .placeholder(
+                                            visible = true,
+                                            color = AppColor.Neutral50,
+                                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                            shape = RoundedCornerShape(4.dp)
+                                        ),
+                                    text = "Catgegory",
+                                    textType = TextType.BottomMenu,
+                                    color = AppColor.Blue60
+                                )
+
+                            }
+                        }
+                    }
+                    is Resource.Success -> {
+                        category.value?.data?.let {
+                            it.forEach { categoryModel ->
+                                Column(
+                                    modifier = Modifier,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    AsyncImage(
+                                        modifier = Modifier.size(48.dp),
+                                        model = categoryModel.image,
+                                        contentDescription = "Icon"
+                                    )
+
+                                    AppText(
+                                        text = categoryModel.category_name ?: "",
+                                        textType = TextType.BottomMenu,
+                                        color = AppColor.Blue60
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    null -> {}
                 }
             }
         }

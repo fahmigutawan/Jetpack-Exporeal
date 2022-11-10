@@ -2,7 +2,7 @@ package com.bcc.exporeal.model
 
 data class PermintaanModel(
     val permintaan_id:String? = null,
-    val permintaan_count:String? = null,
+    val permintaan_count:Int? = null,
     val category_id:String? = null,
     val peminta_uid:String? = null,
     val name:String? = null,

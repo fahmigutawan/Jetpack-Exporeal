@@ -16,6 +16,7 @@ class MainViewModel @Inject constructor(
     val showBottomBar = mutableStateOf(false)
     val showTopBar = mutableStateOf(false)
     val currentRoute = mutableStateOf(AppNavRoute.MySplashScreen.name)
+    val searchState = mutableStateOf("")
 
     val pickedProductToProductDetailScreen = mutableStateOf<ProductModel?>(null)
     val pickedPermintaanToPermintaanDetailScreen = mutableStateOf<PermintaanModel?>(null)

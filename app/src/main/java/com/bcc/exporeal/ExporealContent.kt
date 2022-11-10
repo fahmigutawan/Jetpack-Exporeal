@@ -5,18 +5,25 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.bcc.exporeal.component.AppBottomBar
+import com.bcc.exporeal.component.AppTextInputField
 import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.screen.*
@@ -33,6 +40,7 @@ fun ExporealContent(
     repository: AppRepository
 ) {
     /**Attrs*/
+    val searchBarWidth = LocalConfiguration.current.screenWidthDp / 2
 
     /**Function*/
     navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -92,13 +100,19 @@ fun ExporealContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        AsyncImage(
+                        // Search
+                        AppTextInputField(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .padding(vertical = 12.dp),
-                            model = R.drawable.ic_logo,
-                            contentDescription = "Logo"
-                        )
+                                .width(searchBarWidth.dp),
+                            placeHolderText = "Cari di Exporeal",
+                            valueState = mainViewModel.searchState,
+                            endContent = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Icon",
+                                    tint = AppColor.Neutral60
+                                )
+                            })
 
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -167,13 +181,15 @@ fun ExporealNavHost(
         composable(route = AppNavRoute.HomeScreen.name) {
             HomeScreen(
                 navController = navController,
-                repository = repository,
                 mainViewModel = mainViewModel
             )
         }
 
         composable(route = AppNavRoute.MarketScreen.name) {
-            MarketScreen(navController = navController)
+            MarketScreen(
+                navController = navController,
+                mainViewModel = mainViewModel
+            )
         }
 
         composable(route = AppNavRoute.PelatihanScreen.name) {
@@ -192,8 +208,12 @@ fun ExporealNavHost(
             ProductDetailScreen(navController = navController, mainViewModel = mainViewModel)
         }
 
-        composable(route = AppNavRoute.PermintaanDetailScreen.name){
+        composable(route = AppNavRoute.PermintaanDetailScreen.name) {
             PermintaanDetailScreen(navController = navController, mainViewModel = mainViewModel)
+        }
+
+        composable(route = AppNavRoute.BusinessRegistrationVerificationLandingScreen.name) {
+            BusinessVerificationStatusLandingScreen(navController = navController)
         }
     }
 }

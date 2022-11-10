@@ -83,22 +83,20 @@ class HomeViewModel @Inject constructor(
                 _banner.value = it
             }
         }
-
         viewModelScope.launch {
             repository.getTop10Product().collect {
                 _top10Product.value = it
             }
         }
-
         viewModelScope.launch {
             repository.getTop2Permintaan().collect {
                 _top2Permintaan.value = it
             }
         }
-//        viewModelScope.launch {
-//            repository.getCategory().collect{
-//
-//            }
-//        }
+        viewModelScope.launch {
+            repository.getCategories().collect{
+                _category.value = it
+            }
+        }
     }
 }

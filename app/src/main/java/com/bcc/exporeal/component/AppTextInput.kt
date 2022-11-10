@@ -38,7 +38,7 @@ fun AppTextInputField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = true,
-    maxLines: Int = 1,
+    maxLines: Int = if(singleLine) 1 else Int.MAX_VALUE,
     leadingContent: @Composable (() -> Unit)? = null,
     endContent: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -54,7 +54,7 @@ fun AppTextInputField(
             .border(width = 1.dp, color = AppColor.Neutral50, shape = RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor),
-        contentAlignment = Alignment.CenterEnd,
+        contentAlignment = Alignment.TopEnd,
     ) {
         BasicTextField(
             value = valueState.value,
@@ -87,24 +87,28 @@ fun AppTextInputField(
                 )
             }
         }
-        Box(
-            modifier = modifier
-                .padding(horizontal = textPadding)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(textPadding)
+                .onSizeChanged {
+                    with(density) {
+                        if (it.height.toDp() > containerHeight.value) {
+                            containerHeight.value = it.height.toDp()
+                        }
+                    }
+                },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                leadingContent?.let { leading ->
-                    leading()
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                endContent?.let { end ->
-                    Spacer(modifier = Modifier.width(8.dp))
-                    end()
-                }
-            }
+            if (leadingContent != null) {
+                leadingContent()
+            } else Box(modifier = Modifier)
+
+            if (endContent != null) {
+                endContent()
+            } else Box(modifier = Modifier)
         }
     }
 }

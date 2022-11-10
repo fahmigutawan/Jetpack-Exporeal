@@ -11,5 +11,6 @@ enum class AppNavRoute {
     ProfileScreen,
     BusinessRegistrationScreen,
     ProductDetailScreen,
-    PermintaanDetailScreen
+    PermintaanDetailScreen,
+    BusinessRegistrationVerificationLandingScreen
 }

@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bcc.exporeal.model.CategoryModel
 import com.bcc.exporeal.model.PermintaanModel
 import com.bcc.exporeal.model.ProductModel
+import com.bcc.exporeal.model.UserModel
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.screen.MarketTopMenuItem
 import com.bcc.exporeal.util.PagingState
@@ -26,6 +28,8 @@ class MarketViewModel @Inject constructor(
     val permintaanPagingState = mutableStateOf(PagingState.Success)
     val productList = mutableStateListOf<ProductModel>()
     val permintaanList = mutableStateListOf<PermintaanModel>()
+    val listOfUserInfo = mutableStateListOf<Resource<UserModel>?>()
+    val listOfCategory = mutableStateListOf<Resource<CategoryModel>?>()
 
     fun loadFirstProducts() = viewModelScope.launch {
         repository.getFirstProductsWithNoFilter().collect{
@@ -49,7 +53,7 @@ class MarketViewModel @Inject constructor(
 
     fun loadNextProducts() = viewModelScope.launch {
         repository.getNextProductsWithNoFilter(
-            lastVisiblePostCount = productList.last().product_count ?: ""
+            lastVisiblePostCount = productList.last().product_count ?: 0
         ).collect{
             when(it){
                 is Resource.Error -> {
@@ -91,7 +95,7 @@ class MarketViewModel @Inject constructor(
 
     fun loadNextPermintaan() = viewModelScope.launch {
         repository.getNextPermintaanWithNoFilter(
-            lastVisiblePermintaanCount = permintaanList.last().permintaan_count ?: ""
+            lastVisiblePermintaanCount = permintaanList.last().permintaan_count ?: 0
         ).collect{
             when(it){
                 is Resource.Error -> {
@@ -121,6 +125,48 @@ class MarketViewModel @Inject constructor(
         permintaanList.clear()
 
         loadFirstPermintaan()
+    }
+
+    fun getCategoryById(
+        category_id: String,
+        onSuccess: (CategoryModel) -> Unit,
+        onFailed: () -> Unit
+    ) = viewModelScope.launch {
+        repository.getCategoryByCategoryId(category_id).collect {
+            when(it){
+                is Resource.Error -> {
+                    onFailed()
+                }
+                is Resource.Loading -> {
+
+                }
+                is Resource.Success -> {
+                    onSuccess(it.data!!)
+                }
+                null -> {}
+            }
+        }
+    }
+
+    fun getUserById(
+        uid: String,
+        onSuccess: (UserModel) -> Unit,
+        onFailed: () -> Unit
+    ) = viewModelScope.launch {
+        repository.getUserInfoByUid(uid).collect {
+            when(it){
+                is Resource.Error -> {
+                    onFailed()
+                }
+                is Resource.Loading -> {
+
+                }
+                is Resource.Success -> {
+                    onSuccess(it.data!!)
+                }
+                null -> {}
+            }
+        }
     }
 
     init {

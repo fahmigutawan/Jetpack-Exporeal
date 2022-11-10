@@ -4,11 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -24,13 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bcc.exporeal.component.*
+import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.util.PagingState
+import com.bcc.exporeal.util.Resource
+import com.bcc.exporeal.viewmodel.MainViewModel
 import com.bcc.exporeal.viewmodel.MarketViewModel
 
 @Composable
 fun MarketScreen(
-    navController: NavController
+    navController: NavController,
+    mainViewModel: MainViewModel
 ) {
     /**Attrs*/
     val viewModel = hiltViewModel<MarketViewModel>()
@@ -43,6 +44,7 @@ fun MarketScreen(
     MarketContent(
         navController = navController,
         viewModel = viewModel,
+        mainViewModel = mainViewModel,
         productLazyState = productLazyState,
         permintaanLazyState = permintaanLazyState
     )
@@ -52,6 +54,7 @@ fun MarketScreen(
 private fun MarketContent(
     navController: NavController,
     viewModel: MarketViewModel,
+    mainViewModel:MainViewModel,
     productLazyState: LazyGridState,
     permintaanLazyState: LazyListState
 ) {
@@ -59,16 +62,12 @@ private fun MarketContent(
     val gridItemWidth = LocalConfiguration.current.screenWidthDp / 2
     val queryNextProduct = remember {
         derivedStateOf {
-            viewModel.productList.isNotEmpty()
-                    && viewModel.productList.size % 8 == 0
-                    && productLazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == viewModel.productList.size - 1
+            viewModel.productList.isNotEmpty() && viewModel.productList.size % 8 == 0 && productLazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == viewModel.productList.size - 1
         }
     }
     val queryNextPermintaan = remember {
         derivedStateOf {
-            viewModel.permintaanList.isNotEmpty()
-                    && viewModel.permintaanList.size % 8 == 0
-                    && permintaanLazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == viewModel.permintaanList.size - 1
+            viewModel.permintaanList.isNotEmpty() && viewModel.permintaanList.size % 8 == 0 && permintaanLazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == viewModel.permintaanList.size - 1
         }
     }
 
@@ -80,6 +79,41 @@ private fun MarketContent(
     LaunchedEffect(key1 = queryNextPermintaan.value) {
         if (queryNextPermintaan.value) {
             viewModel.loadNextPermintaan()
+        }
+    }
+    LaunchedEffect(key1 = viewModel.permintaanPagingState.value == PagingState.Success) {
+        if (viewModel.permintaanPagingState.value == PagingState.Success && viewModel.permintaanList.isNotEmpty()) {
+            for (i in 0..((viewModel.permintaanList.size - viewModel.listOfUserInfo.size) - 1)) {
+                viewModel.listOfUserInfo.add(Resource.Loading())
+                viewModel.listOfCategory.add(Resource.Loading())
+            }
+        }
+    }
+    LaunchedEffect(key1 = viewModel.permintaanPagingState.value == PagingState.Success) {
+        if (viewModel.permintaanPagingState.value == PagingState.Success && viewModel.permintaanList.isNotEmpty()) {
+            viewModel.permintaanList.forEachIndexed { index, permintaanModel ->
+                if (viewModel.listOfUserInfo[index] is Resource.Success) {
+
+                } else {
+                    viewModel.getUserById(uid = permintaanModel.peminta_uid ?: "", onSuccess = {
+                        viewModel.listOfUserInfo[index] = Resource.Success(it)
+                    }, onFailed = {
+                        /*TODO*/
+                    })
+                }
+
+                if (viewModel.listOfCategory[index] is Resource.Success) {
+
+                } else {
+                    viewModel.getCategoryById(category_id = permintaanModel.category_id ?: "",
+                        onSuccess = {
+                            viewModel.listOfCategory[index] = Resource.Success(it)
+                        },
+                        onFailed = {
+                            /*TODO*/
+                        })
+                }
+            }
         }
     }
 
@@ -129,25 +163,6 @@ private fun MarketContent(
         // Content
         when (viewModel.selectedTopMenu.value) {
             MarketTopMenuItem.Produk -> {
-                Column(
-                    modifier = Modifier.padding(vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Search
-                    AppTextInputField(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp),
-                        placeHolderText = "Cari di Exporeal",
-                        valueState = viewModel.searchState,
-                        endContent = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Icon",
-                                tint = AppColor.Neutral60
-                            )
-                        }
-                    )
-
                     // Items
                     LazyVerticalGrid(
                         modifier = Modifier.padding(vertical = 16.dp),
@@ -155,19 +170,24 @@ private fun MarketContent(
                         columns = GridCells.Fixed(2),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        items(viewModel.productList) { item ->
-                            Box(
-                                modifier = Modifier
-                                    .width(gridItemWidth.dp)
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                ProductItem(
-                                    productModel = item,
-                                    onClick = {
-                                        /*TODO*/
-                                    }
-                                )
+                        if (viewModel.productList.isNotEmpty()) {
+                            items(viewModel.productList) { item ->
+                                Box(
+                                    modifier = Modifier
+                                        .width(gridItemWidth.dp)
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    ProductItem(
+                                        productModel = item,
+                                        onClick = {
+                                            mainViewModel.pickedProductToProductDetailScreen.value = it
+                                            if (mainViewModel.pickedProductToProductDetailScreen.value != null) {
+                                                navController.navigate(route = AppNavRoute.ProductDetailScreen.name)
+                                            }
+                                        }
+                                    )
+                                }
                             }
                         }
 
@@ -184,15 +204,16 @@ private fun MarketContent(
                             }
                         }
                     }
-                }
             }
             MarketTopMenuItem.Permintaan -> {
-                Column(
-                    modifier = Modifier.padding(vertical = 16.dp)
+                LazyColumn(
+                    state = permintaanLazyState,
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(4.dp)
                 ) {
-                    // Make request btn & Search
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        // Request
+                    // Request Btn
+                    item {
                         AppButton(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -200,37 +221,37 @@ private fun MarketContent(
                             onClick = { /*TODO*/ },
                             text = "MAKE A REQUEST"
                         )
-
-                        // Search
-                        AppTextInputField(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp),
-                            placeHolderText = "Cari di Exporeal",
-                            valueState = viewModel.searchState,
-                            endContent = {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = "Icon",
-                                    tint = AppColor.Neutral60
-                                )
-                            }
-                        )
                     }
 
                     // Items
-                    LazyColumn(
-                        state = permintaanLazyState,
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        contentPadding = PaddingValues(4.dp)
-                    ) {
-                        items(viewModel.permintaanList){ item ->
-                            PermintaanItem(
-                                onDetailClicked = { /*TODO*/ },
-                                permintaanModel = item,
-                                userInfo = ,
-                                category =
-                            )
+                    when {
+                        viewModel.permintaanList.isNotEmpty() -> {
+                            if (viewModel.listOfUserInfo.size == viewModel.permintaanList.size
+                                && viewModel.listOfCategory.size == viewModel.permintaanList.size
+                            ) {
+                                itemsIndexed(viewModel.permintaanList) { index, item ->
+                                    PermintaanItem(
+                                        onDetailClicked = {
+                                            mainViewModel.pickedPermintaanToPermintaanDetailScreen.value = item
+                                            if (mainViewModel.pickedPermintaanToPermintaanDetailScreen.value != null) {
+                                                navController.navigate(route = AppNavRoute.PermintaanDetailScreen.name)
+                                            }
+                                        },
+                                        permintaanModel = item,
+                                        userInfo = viewModel.listOfUserInfo[index],
+                                        category = viewModel.listOfCategory[index]
+                                    )
+                                }
+                            }
+                        }
+
+
+                        else -> {
+                            if (viewModel.productPagingState.value == PagingState.NextLoad) {
+                                items(8) {
+                                    PermintaanItemLoading()
+                                }
+                            }
                         }
                     }
                 }
@@ -238,6 +259,7 @@ private fun MarketContent(
         }
     }
 }
+
 
 enum class MarketTopMenuItem(
     val word: String

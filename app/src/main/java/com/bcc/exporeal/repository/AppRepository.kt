@@ -50,6 +50,9 @@ class AppRepository @Inject constructor(
     // (AUTH) CHECK isLoggedIn
     fun isLoggedIn() = (auth.currentUser != null)
 
+    // (AUTH) GET current UID
+    fun getCurrentUid() = auth.currentUser?.uid ?: ""
+
     // (AUTH) Login with email-password
     fun loginWithEmailPassword(
         email: String, password: String, onSuccess: () -> Unit, onFailed: () -> Unit
@@ -117,6 +120,10 @@ class AppRepository @Inject constructor(
             }
     }
 
+    // (FIRESTORE) GET random key from specific collection
+    fun getRandomKey(collection_name: String) =
+        firestoreDb.collection(collection_name).document().id
+
     // (FIRESTORE) GET own userInfo
     fun getOwnUserInfo(): Flow<Resource<UserModel>?> = getResponse.getFirestoreResponse {
         firestoreDb.collection("user").document(auth.currentUser?.uid ?: "").get()
@@ -138,7 +145,7 @@ class AppRepository @Inject constructor(
     fun getCategories(): Flow<Resource<List<CategoryModel>>?> =
         getResponse.getFirestoreListResponse {
             firestoreDb.collection("category")
-                .orderBy("category_id", com.google.firebase.firestore.Query.Direction.ASCENDING)
+                .orderBy("count", com.google.firebase.firestore.Query.Direction.ASCENDING)
                 .get()
         }
 
@@ -181,7 +188,7 @@ class AppRepository @Inject constructor(
         }
 
     // (FIRESTORE) GET list of next 8 products
-    fun getNextProductsWithNoFilter(lastVisiblePostCount: String): Flow<Resource<List<ProductModel>>?> =
+    fun getNextProductsWithNoFilter(lastVisiblePostCount: Int): Flow<Resource<List<ProductModel>>?> =
         getResponse.getFirestoreListResponse {
             firestoreDb.collection("product").orderBy(
                 "product_count", com.google.firebase.firestore.Query.Direction.ASCENDING
@@ -197,10 +204,33 @@ class AppRepository @Inject constructor(
         }
 
     // (FIRESTORE) GET list of next 8 permintaan
-    fun getNextPermintaanWithNoFilter(lastVisiblePermintaanCount: String): Flow<Resource<List<PermintaanModel>>?> =
+    fun getNextPermintaanWithNoFilter(lastVisiblePermintaanCount: Int): Flow<Resource<List<PermintaanModel>>?> =
         getResponse.getFirestoreListResponse {
             firestoreDb.collection("permintaan").orderBy(
                 "permintaan_count", com.google.firebase.firestore.Query.Direction.ASCENDING
             ).startAfter(lastVisiblePermintaanCount).limit(8).get()
+        }
+
+    // (FIRESTORE) SAVE bisnis register
+    fun saveBusinessRegistorToFirestore(
+        body: BusinessModel,
+        onSuccess: () -> Unit,
+        onFailed: () -> Unit
+    ) {
+        firestoreDb
+            .collection("business")
+            .document(body.business_id ?: "")
+            .set(body)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailed() }
+    }
+
+    fun getBusinessByUid(): Flow<Resource<List<BusinessModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("business")
+                .whereGreaterThanOrEqualTo("uid", getCurrentUid())
+                .whereLessThanOrEqualTo("uid", "${getCurrentUid()}\uF7FF")
+                .get()
         }
 }
