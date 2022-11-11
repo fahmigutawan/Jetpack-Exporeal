@@ -23,13 +23,14 @@ class MarketViewModel @Inject constructor(
     private val repository: AppRepository
 ):ViewModel() {
     val selectedTopMenu = mutableStateOf(MarketTopMenuItem.Produk)
-    val searchState = mutableStateOf("")
     val productPagingState = mutableStateOf(PagingState.Success)
     val permintaanPagingState = mutableStateOf(PagingState.Success)
     val productList = mutableStateListOf<ProductModel>()
     val permintaanList = mutableStateListOf<PermintaanModel>()
     val listOfUserInfo = mutableStateListOf<Resource<UserModel>?>()
     val listOfCategory = mutableStateListOf<Resource<CategoryModel>?>()
+    val productPageFinished = mutableStateOf(false)
+    val permintaaanPageFinished = mutableStateOf(false)
 
     fun loadFirstProducts() = viewModelScope.launch {
         repository.getFirstProductsWithNoFilter().collect{
@@ -65,6 +66,7 @@ class MarketViewModel @Inject constructor(
                 is Resource.Success -> {
                     productPagingState.value = PagingState.Success
                     it.data?.let { list ->
+                        if(list.isEmpty()) productPageFinished.value = true
                         productList.addAll(list)
                     }
                 }
@@ -107,6 +109,7 @@ class MarketViewModel @Inject constructor(
                 is Resource.Success -> {
                     permintaanPagingState.value = PagingState.Success
                     it.data?.let { list ->
+                        if(list.isEmpty()) permintaaanPageFinished.value = true
                         permintaanList.addAll(list)
                     }
                 }

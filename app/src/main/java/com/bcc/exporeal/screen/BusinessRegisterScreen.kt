@@ -20,6 +20,7 @@ import com.bcc.exporeal.SnackbarListener
 import com.bcc.exporeal.component.*
 import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.ui.style.AppColor
+import com.bcc.exporeal.util.ListenAppBackHandler
 import com.bcc.exporeal.util.getFileName
 import com.bcc.exporeal.viewmodel.BusinessRegisterViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -42,6 +43,13 @@ fun BusinessRegisterScreen(navController: NavController) {
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = viewModel.isLoading.value)
 
     /**Function*/
+    ListenAppBackHandler {
+        navController.navigate(route = AppNavRoute.ProfileScreen.name){
+            popUpTo(route = AppNavRoute.BusinessRegistrationScreen.name){
+                inclusive = true
+            }
+        }
+    }
     if (viewModel.isLoading.value) {
         LaunchedEffect(key1 = true) {
             delay(2000)

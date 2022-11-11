@@ -19,6 +19,8 @@ class ProductDetailViewModel @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {
     val expandDescription = mutableStateOf(false)
+    val showSnackbar = mutableStateOf(false)
+    val snackbarMessage = mutableStateOf("")
 
     private val _productPictures =
         MutableStateFlow<Resource<List<ProductPictureModel>>?>(Resource.Loading())
@@ -53,4 +55,6 @@ class ProductDetailViewModel @Inject constructor(
             }
         }
     }
+
+    fun getCurrentUid() = repository.getCurrentUid()
 }

@@ -28,7 +28,7 @@ fun AppButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     backgroundColor: Color = AppColor.Blue60,
-    disabledBackgroudnColor: Color = Color.Gray,
+    disabledBackgroundColor: Color = AppColor.Neutral30,
     rippleColor: Color = Color.White,
     enabled: Boolean = true,
     borderWidth: Dp = 0.dp,
@@ -47,7 +47,7 @@ fun AppButton(
                 .clip(shape)
                 .size(width = contentWidth.value, height = contentHeight.value)
                 .border(width = borderWidth, color = borderColor, shape = shape)
-                .background(if (enabled) backgroundColor else disabledBackgroudnColor),
+                .background(if (enabled) backgroundColor else disabledBackgroundColor),
             contentAlignment = contentAlignment
         ) {
 
@@ -83,7 +83,7 @@ fun AppButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     backgroundColor: Color = AppColor.Blue60,
-    disabledBackgroudnColor: Color = Color.Gray,
+    disabledBackgroundColor: Color = AppColor.Neutral30,
     rippleColor: Color = Color.White,
     enabled: Boolean = true,
     borderWidth: Dp = 0.dp,
@@ -103,7 +103,7 @@ fun AppButton(
                 .clip(shape)
                 .size(width = contentWidth.value, height = contentHeight.value)
                 .border(width = borderWidth, color = borderColor, shape = shape)
-                .background(if (enabled) backgroundColor else disabledBackgroudnColor),
+                .background(if (enabled) backgroundColor else disabledBackgroundColor),
             contentAlignment = contentAlignment
         ) {
 

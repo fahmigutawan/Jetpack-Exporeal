@@ -12,6 +12,5 @@ data class PermintaanModel(
     val quantity_unit:String? = null,
     val bottom_price:String? = null,
     val top_price:String? = null,
-    val flag_id:String? = null,
     val tanggal_permintaan:String? = null
 )

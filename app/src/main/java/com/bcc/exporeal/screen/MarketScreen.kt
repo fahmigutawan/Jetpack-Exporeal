@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -54,7 +55,7 @@ fun MarketScreen(
 private fun MarketContent(
     navController: NavController,
     viewModel: MarketViewModel,
-    mainViewModel:MainViewModel,
+    mainViewModel: MainViewModel,
     productLazyState: LazyGridState,
     permintaanLazyState: LazyListState
 ) {
@@ -72,13 +73,17 @@ private fun MarketContent(
     }
 
     LaunchedEffect(key1 = queryNextProduct.value) {
-        if (queryNextProduct.value) {
-            viewModel.loadNextProducts()
+        if (!viewModel.productPageFinished.value) {
+            if (queryNextProduct.value) {
+                viewModel.loadNextProducts()
+            }
         }
     }
     LaunchedEffect(key1 = queryNextPermintaan.value) {
-        if (queryNextPermintaan.value) {
-            viewModel.loadNextPermintaan()
+        if (!viewModel.permintaaanPageFinished.value) {
+            if (queryNextPermintaan.value) {
+                viewModel.loadNextPermintaan()
+            }
         }
     }
     LaunchedEffect(key1 = viewModel.permintaanPagingState.value == PagingState.Success) {
@@ -163,47 +168,49 @@ private fun MarketContent(
         // Content
         when (viewModel.selectedTopMenu.value) {
             MarketTopMenuItem.Produk -> {
-                    // Items
-                    LazyVerticalGrid(
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        state = productLazyState,
-                        columns = GridCells.Fixed(2),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        if (viewModel.productList.isNotEmpty()) {
-                            items(viewModel.productList) { item ->
-                                Box(
-                                    modifier = Modifier
-                                        .width(gridItemWidth.dp)
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    ProductItem(
-                                        productModel = item,
-                                        onClick = {
-                                            mainViewModel.pickedProductToProductDetailScreen.value = it
-                                            if (mainViewModel.pickedProductToProductDetailScreen.value != null) {
-                                                navController.navigate(route = AppNavRoute.ProductDetailScreen.name)
-                                            }
+                // Items
+                LazyVerticalGrid(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    state = productLazyState,
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (viewModel.productList.isNotEmpty()) {
+                        items(viewModel.productList) { item ->
+                            Box(
+                                modifier = Modifier
+                                    .width(gridItemWidth.dp)
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ProductItem(
+                                    productModel = item,
+                                    onClick = {
+                                        mainViewModel.pickedProductToProductDetailScreen.value = it
+                                        if (mainViewModel.pickedProductToProductDetailScreen.value != null) {
+                                            navController.navigate(route = AppNavRoute.ProductDetailScreen.name)
                                         }
-                                    )
-                                }
-                            }
-                        }
-
-                        if (viewModel.productPagingState.value == PagingState.NextLoad) {
-                            items(8) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(gridItemWidth.dp)
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    ProductItemLoading()
-                                }
+                                    }
+                                )
                             }
                         }
                     }
+
+                    if (viewModel.productPagingState.value == PagingState.NextLoad) {
+//                        if (viewModel.productList.isEmpty()) {
+                        items(6) {
+                            Box(
+                                modifier = Modifier
+                                    .width(gridItemWidth.dp)
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ProductItemLoading()
+                            }
+                        }
+//                        }
+                    }
+                }
             }
             MarketTopMenuItem.Permintaan -> {
                 LazyColumn(
@@ -232,7 +239,8 @@ private fun MarketContent(
                                 itemsIndexed(viewModel.permintaanList) { index, item ->
                                     PermintaanItem(
                                         onDetailClicked = {
-                                            mainViewModel.pickedPermintaanToPermintaanDetailScreen.value = item
+                                            mainViewModel.pickedPermintaanToPermintaanDetailScreen.value =
+                                                item
                                             if (mainViewModel.pickedPermintaanToPermintaanDetailScreen.value != null) {
                                                 navController.navigate(route = AppNavRoute.PermintaanDetailScreen.name)
                                             }
@@ -248,9 +256,11 @@ private fun MarketContent(
 
                         else -> {
                             if (viewModel.productPagingState.value == PagingState.NextLoad) {
-                                items(8) {
-                                    PermintaanItemLoading()
-                                }
+//                                if (viewModel.permintaanList.isEmpty()) {
+                                    items(6) {
+                                        PermintaanItemLoading()
+                                    }
+//                                }
                             }
                         }
                     }

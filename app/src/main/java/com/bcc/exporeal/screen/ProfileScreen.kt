@@ -118,7 +118,13 @@ fun ProfileScreen(navController: NavController) {
     )
 
     /**Content*/
-    SwipeRefresh(state = swipeRefreshState, onRefresh = { /*TODO*/ }) {
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = {
+            viewModel.isLoading.value = true
+            viewModel.refresh()
+        }
+    ) {
         ProfileContent(
             navController = navController,
             viewModel = viewModel,
@@ -412,6 +418,7 @@ private fun ProfileContent(
             ) {
                 AppText(text = "Personal", textType = TextType.H3, color = AppColor.Neutral60)
 
+                // Akun
                 AppButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { /*TODO*/ },
@@ -435,29 +442,182 @@ private fun ProfileContent(
                     }
                 }
 
-                AppButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { /*TODO*/ },
-                    backgroundColor = AppColor.Neutral10,
-                    rippleColor = AppColor.Neutral100,
-                    borderWidth = 1.dp,
-                    borderColor = AppColor.Neutral60
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier.size(24.dp),
-                            model = R.drawable.ic_profile_perusahaansaya,
-                            contentDescription = "Icon"
-                        )
+                // Perusahaan saya
+                when (business.value) {
+                    is Resource.Error -> {
+                        AppButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { viewModel.showPleaseRefreshSnackbar.value = true },
+                            backgroundColor = AppColor.Neutral10,
+                            rippleColor = AppColor.Neutral100,
+                            borderWidth = 1.dp,
+                            borderColor = AppColor.Neutral60
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                AsyncImage(
+                                    modifier = Modifier.size(24.dp),
+                                    model = R.drawable.ic_profile_perusahaansaya,
+                                    contentDescription = "Icon"
+                                )
 
-                        AppText(text = "Perusahaan Saya", textType = TextType.Body1)
+                                AppText(text = "Perusahaan Saya", textType = TextType.Body1)
+                            }
+                        }
+                    }
+                    is Resource.Loading -> {
+                        AppButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {},
+                            backgroundColor = AppColor.Neutral10,
+                            rippleColor = AppColor.Neutral100,
+                            borderWidth = 1.dp,
+                            borderColor = AppColor.Neutral60,
+                            enabled = false
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                AsyncImage(
+                                    modifier = Modifier.size(24.dp),
+                                    model = R.drawable.ic_profile_perusahaansaya,
+                                    contentDescription = "Icon"
+                                )
+
+                                AppText(
+                                    text = "Perusahaan Saya",
+                                    textType = TextType.Body1,
+                                    color = AppColor.Neutral50
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Success -> {
+                        business.value?.data?.let {
+                            if (it.isEmpty()) {
+                                AppButton(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {},
+                                    backgroundColor = AppColor.Neutral10,
+                                    rippleColor = AppColor.Neutral100,
+                                    borderWidth = 1.dp,
+                                    borderColor = AppColor.Neutral60,
+                                    enabled = false
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        AsyncImage(
+                                            modifier = Modifier.size(24.dp),
+                                            model = R.drawable.ic_profile_perusahaansaya,
+                                            contentDescription = "Icon"
+                                        )
+
+                                        AppText(
+                                            text = "Perusahaan Saya",
+                                            textType = TextType.Body1,
+                                            color = AppColor.Neutral50
+                                        )
+                                    }
+                                }
+                            } else {
+                                if (it[0].verification_status != 4) {
+                                    AppButton(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onClick = {},
+                                        backgroundColor = AppColor.Neutral10,
+                                        rippleColor = AppColor.Neutral100,
+                                        borderWidth = 1.dp,
+                                        borderColor = AppColor.Neutral60,
+                                        enabled = false
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            AsyncImage(
+                                                modifier = Modifier.size(24.dp),
+                                                model = R.drawable.ic_profile_perusahaansaya,
+                                                contentDescription = "Icon"
+                                            )
+
+                                            AppText(
+                                                text = "Perusahaan Saya",
+                                                textType = TextType.Body1,
+                                                color = AppColor.Neutral50
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    AppButton(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onClick = { navController.navigate(route = AppNavRoute.ProductOfMerchantScreen.name) },
+                                        backgroundColor = AppColor.Neutral10,
+                                        rippleColor = AppColor.Neutral100,
+                                        borderWidth = 1.dp,
+                                        borderColor = AppColor.Neutral60
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            AsyncImage(
+                                                modifier = Modifier.size(24.dp),
+                                                model = R.drawable.ic_profile_perusahaansaya,
+                                                contentDescription = "Icon"
+                                            )
+
+                                            AppText(
+                                                text = "Perusahaan Saya",
+                                                textType = TextType.Body1
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    null -> {
+                        AppButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {},
+                            backgroundColor = AppColor.Neutral10,
+                            rippleColor = AppColor.Neutral100,
+                            borderWidth = 1.dp,
+                            borderColor = AppColor.Neutral60,
+                            enabled = false
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                AsyncImage(
+                                    modifier = Modifier.size(24.dp),
+                                    model = R.drawable.ic_profile_perusahaansaya,
+                                    contentDescription = "Icon"
+                                )
+
+                                AppText(
+                                    text = "Perusahaan Saya",
+                                    textType = TextType.Body1,
+                                    color = AppColor.Neutral50
+                                )
+                            }
+                        }
                     }
                 }
 
+                // Riwayat transaksi
                 AppButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { /*TODO*/ },

@@ -222,21 +222,6 @@ private fun HomeContent(
             }
         }
 
-        // Search Field
-        item {
-            AppTextInputField(
-                placeHolderText = "Cari di Exporeal",
-                valueState = viewModel.searchState,
-                endContent = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Icon",
-                        tint = AppColor.Neutral60
-                    )
-                }
-            )
-        }
-
         // Kategori title
         item {
             AppText(text = "Kategori", textType = TextType.H3, color = AppColor.Neutral100)

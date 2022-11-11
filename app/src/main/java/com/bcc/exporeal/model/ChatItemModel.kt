@@ -7,5 +7,5 @@ data class ChatItemModel(
     val sender: String? = null,
     val receiver: String? = null,
     val product_id: String? = null,
-    val permintaam_id: String? = null
+    val permintaan_id: String? = null
 )

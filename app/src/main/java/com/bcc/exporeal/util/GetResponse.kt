@@ -1,5 +1,6 @@
 package com.bcc.exporeal.util
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -29,8 +30,10 @@ class GetResponse @Inject constructor(
             val result = response.toObject(Y::class.java)
             emit(Resource.Success(result))
         } catch (e: FirebaseFirestoreException) {
+            Log.e("ERROR", e.message.toString())
             emit(Resource.Error(e.message ?: "Error while connecting to server"))
         } catch (e: Exception) {
+            Log.e("ERROR", e.message.toString())
             emit(Resource.Error(e.message ?: "Something went wrong"))
         }
     }
@@ -52,8 +55,10 @@ class GetResponse @Inject constructor(
             }
             emit(Resource.Success(result))
         } catch (e: FirebaseFirestoreException) {
+            Log.e("ERROR", e.message.toString())
             emit(Resource.Error(e.message ?: "Error while connecting to server"))
         } catch (e: Exception) {
+            Log.e("ERROR", e.message.toString())
             emit(Resource.Error(e.message ?: "Something went wrong"))
         }
     }

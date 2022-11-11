@@ -1,5 +1,6 @@
 package com.bcc.exporeal.component
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -7,6 +8,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,8 +20,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.bcc.exporeal.R
 import com.bcc.exporeal.model.CategoryModel
 import com.bcc.exporeal.model.PermintaanModel
 import com.bcc.exporeal.model.ProductModel
@@ -236,18 +243,43 @@ fun PermintaanItem(
                         }
 
                         //FLAG
-                        AsyncImage(
-                            modifier = Modifier
-                                .height(34.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .border(
-                                    width = 1.dp,
-                                    shape = RoundedCornerShape(4.dp),
-                                    color = AppColor.Neutral30
-                                ),
-                            model = "https://countryflagsapi.com/png/${permintaanModel.flag_id ?: ""}",
-                            contentDescription = "Flag"
-                        )
+                        when (userInfo) {
+                            is Resource.Error -> {
+                                Box(
+                                    modifier = Modifier
+                                        .size(width = 51.dp, height = 34.dp)
+                                        .background(AppColor.Neutral100)
+                                )
+                            }
+                            is Resource.Loading -> {
+                                Box(
+                                    modifier = Modifier
+                                        .size(width = 51.dp, height = 34.dp)
+                                        .placeholder(
+                                            visible = true,
+                                            color = AppColor.Neutral50,
+                                            highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                )
+                            }
+                            is Resource.Success -> {
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .height(34.dp)
+                                        .width(51.dp)
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .border(
+                                            width = 1.dp,
+                                            shape = RoundedCornerShape(4.dp),
+                                            color = AppColor.Neutral30
+                                        ),
+                                    model = "https://flagcdn.com/h40/${userInfo.data!!.country_id ?: ""}.png",
+                                    contentDescription = "Flag"
+                                )
+                            }
+                            null -> {}
+                        }
                     }
 
                     // Product Name
@@ -344,7 +376,14 @@ fun PermintaanItem(
 
             // Detail button
             AppButton(
-                modifier = Modifier.fillMaxWidth(), onClick = onDetailClicked, text = "LIHAT DETAIL"
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onDetailClicked,
+                text = "LIHAT DETAIL",
+                textColor = AppColor.Blue60,
+                backgroundColor = AppColor.Neutral10,
+                borderColor = AppColor.Blue60,
+                borderWidth = 1.dp,
+                rippleColor = AppColor.Neutral100
             )
 
             // Tanggal pemesanan
@@ -529,7 +568,14 @@ fun PermintaanItemLoading() {
 
             // Detail button
             AppButton(
-                modifier = Modifier.fillMaxWidth(), onClick = { }, text = "LIHAT DETAIL"
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { },
+                text = "LIHAT DETAIL",
+                textColor = AppColor.Blue60,
+                backgroundColor = AppColor.Neutral10,
+                borderColor = AppColor.Blue60,
+                borderWidth = 1.dp,
+                rippleColor = AppColor.Neutral100
             )
 
             // Tanggal pemesanan
@@ -547,5 +593,67 @@ fun PermintaanItemLoading() {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun AddProductImagePicker(
+    onClick: () -> Unit,
+    size: Dp
+) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(8.dp))
+            .background(AppColor.Blue20)
+            .border(shape = RoundedCornerShape(8.dp), color = AppColor.Blue60, width = 1.dp)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add",
+                tint = AppColor.Blue60
+            )
+
+            AppText(text = "Add Photo", textType = TextType.Body3, color = AppColor.Blue60)
+        }
+    }
+}
+
+@Composable
+fun AddProductImagePreview(
+    imgUri: Uri,
+    onDeleteClicked: () -> Unit,
+    size: Dp
+) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(8.dp))
+            .background(AppColor.Neutral100),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        AsyncImage(
+            modifier = Modifier
+                .size(size)
+                .clip(RoundedCornerShape(8.dp)),
+            model = imgUri,
+            contentDescription = "Uri"
+        )
+
+        Icon(
+            modifier = Modifier
+                .clickable {
+                    onDeleteClicked()
+                },
+            imageVector = Icons.Default.Delete,
+            contentDescription = "Delete",
+            tint = AppColor.Negative60
+        )
     }
 }

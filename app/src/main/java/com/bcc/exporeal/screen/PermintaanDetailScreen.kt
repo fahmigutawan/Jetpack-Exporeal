@@ -16,10 +16,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -31,10 +28,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.bcc.exporeal.R
+import com.bcc.exporeal.SnackbarListener
 import com.bcc.exporeal.component.*
 import com.bcc.exporeal.model.CategoryModel
 import com.bcc.exporeal.model.ProductPictureModel
 import com.bcc.exporeal.model.UserModel
+import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.util.Resource
 import com.bcc.exporeal.viewmodel.MainViewModel
@@ -46,6 +45,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -82,6 +82,7 @@ fun PermintaanDetailScreen(
             )
         }
     }
+    SnackbarListener(viewModel.snackbarMessage.value, viewModel.showSnackbar)
 
     /**Content*/
     Scaffold(
@@ -98,7 +99,17 @@ fun PermintaanDetailScreen(
                 ) {
                     AppButton(
                         modifier = Modifier.fillMaxSize(),
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            merchant.value?.data?.let {
+                                if ((it.uid ?: "") == viewModel.getCurrentUid()) {
+                                    viewModel.snackbarMessage.value =
+                                        "You can't message your own account"
+                                    viewModel.showSnackbar.value = true
+                                } else {
+                                    navController.navigate(route = "${AppNavRoute.ChatDetailScreen.name}/${it.uid ?: ""}/req=${mainViewModel.pickedPermintaanToPermintaanDetailScreen.value!!.permintaan_id ?: ""}")
+                                }
+                            }
+                        },
                         text = "CONTACT BUYER"
                     )
                 }
@@ -132,6 +143,7 @@ private fun PermintaanDetailContent(
     val imgPagerState = rememberPagerState()
     val imgWidth = LocalConfiguration.current.screenWidthDp
     val imgHeight = imgWidth * 3 / 4
+    val coroutine = rememberCoroutineScope()
 
     mainViewModel.pickedPermintaanToPermintaanDetailScreen.value?.let { productModel ->
         LazyColumn(
@@ -183,9 +195,10 @@ private fun PermintaanDetailContent(
                 }
                 is Resource.Success -> {
                     productPictures.value?.data?.let {
-                        val imgWithThumbnail = listOf(
-                            productModel.thumbnail
-                        ) + it.map { it.picture_url }
+                        val imgWithThumbnail = if (it.isEmpty()) {
+                            listOf(productModel.thumbnail)
+                        } else it.map { it.picture_url }
+
                         item {
                             // Container img & foreground btn
                             Box(
@@ -226,12 +239,16 @@ private fun PermintaanDetailContent(
                                             .clip(CircleShape)
                                             .background(
                                                 color = when {
-                                                    imgPagerState.currentPage - 1 > 0 -> AppColor.Neutral60
+                                                    imgPagerState.currentPage - 1 >= 0 -> AppColor.Neutral60
                                                     else -> AppColor.Neutral20
                                                 }
                                             ),
-                                        onClick = { /*TODO*/ },
-                                        enabled = imgPagerState.currentPage - 1 > 0
+                                        onClick = {
+                                            coroutine.launch {
+                                                imgPagerState.animateScrollToPage(imgPagerState.currentPage - 1)
+                                            }
+                                        },
+                                        enabled = imgPagerState.currentPage - 1 >= 0
                                     ) {
                                         Icon(
                                             tint = when {
@@ -249,12 +266,16 @@ private fun PermintaanDetailContent(
                                             .clip(CircleShape)
                                             .background(
                                                 color = when {
-                                                    imgPagerState.currentPage + 1 < imgWithThumbnail.size - 1 -> AppColor.Neutral60
+                                                    imgPagerState.currentPage + 1 < imgWithThumbnail.size -> AppColor.Neutral60
                                                     else -> AppColor.Neutral20
                                                 }
                                             ),
-                                        onClick = { /*TODO*/ },
-                                        enabled = imgPagerState.currentPage + 1 < imgWithThumbnail.size - 1
+                                        onClick = {
+                                            coroutine.launch {
+                                                imgPagerState.animateScrollToPage(imgPagerState.currentPage + 1)
+                                            }
+                                        },
+                                        enabled = imgPagerState.currentPage + 1 < imgWithThumbnail.size
                                     ) {
                                         Icon(
                                             tint = when {

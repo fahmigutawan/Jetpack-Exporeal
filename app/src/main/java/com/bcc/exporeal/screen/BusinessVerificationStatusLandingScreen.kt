@@ -15,12 +15,20 @@ import com.bcc.exporeal.component.AppText
 import com.bcc.exporeal.component.TextType
 import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.ui.style.AppColor
+import com.bcc.exporeal.util.ListenAppBackHandler
 
 @Composable
 fun BusinessVerificationStatusLandingScreen(
     navController: NavController
 ) {
     val imgWidth = LocalConfiguration.current.screenWidthDp / 3
+    ListenAppBackHandler {
+        navController.navigate(route = AppNavRoute.ProfileScreen.name){
+            popUpTo(route = AppNavRoute.BusinessRegistrationVerificationLandingScreen.name){
+                inclusive = true
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -12,5 +12,9 @@ enum class AppNavRoute {
     BusinessRegistrationScreen,
     ProductDetailScreen,
     PermintaanDetailScreen,
-    BusinessRegistrationVerificationLandingScreen
+    BusinessRegistrationVerificationLandingScreen,
+    ChatListScreen,
+    ChatDetailScreen,
+    ProductOfMerchantScreen,
+    AddProductScreen
 }

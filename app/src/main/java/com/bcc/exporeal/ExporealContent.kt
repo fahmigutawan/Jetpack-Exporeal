@@ -40,7 +40,6 @@ fun ExporealContent(
     repository: AppRepository
 ) {
     /**Attrs*/
-    val searchBarWidth = LocalConfiguration.current.screenWidthDp / 2
 
     /**Function*/
     navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -98,12 +97,13 @@ fun ExporealContent(
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         // Search
                         AppTextInputField(
                             modifier = Modifier
-                                .width(searchBarWidth.dp),
+                                .fillMaxWidth()
+                                .weight(1f),
                             placeHolderText = "Cari di Exporeal",
                             valueState = mainViewModel.searchState,
                             endContent = {
@@ -113,29 +113,23 @@ fun ExporealContent(
                                     tint = AppColor.Neutral60
                                 )
                             })
+                        AsyncImage(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(vertical = 12.dp)
+                                .clickable { /*TODO*/ },
+                            model = R.drawable.ic_home_notif,
+                            contentDescription = "Notif"
+                        )
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .padding(vertical = 12.dp)
-                                    .clickable { /*TODO*/ },
-                                model = R.drawable.ic_home_notif,
-                                contentDescription = "Notif"
-                            )
-
-                            AsyncImage(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .padding(vertical = 12.dp)
-                                    .clickable { /*TODO*/ },
-                                model = R.drawable.ic_home_chat,
-                                contentDescription = "Notif"
-                            )
-                        }
+                        AsyncImage(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(vertical = 12.dp)
+                                .clickable { navController.navigate(route = AppNavRoute.ChatListScreen.name) },
+                            model = R.drawable.ic_home_chat,
+                            contentDescription = "Chat"
+                        )
                     }
                 }
             }
@@ -214,6 +208,73 @@ fun ExporealNavHost(
 
         composable(route = AppNavRoute.BusinessRegistrationVerificationLandingScreen.name) {
             BusinessVerificationStatusLandingScreen(navController = navController)
+        }
+
+        composable(route = AppNavRoute.ChatListScreen.name) {
+            ChatListScreen(navController = navController)
+        }
+
+        composable(
+            route = "${AppNavRoute.ChatDetailScreen.name}/{uid}",
+            arguments = listOf(
+                navArgument(name = "uid") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val target_uid = it.arguments?.getString("uid") ?: ""
+
+            ChatDetailScreen(navController = navController, target_uid = target_uid)
+        }
+
+        composable(
+            route = "${AppNavRoute.ChatDetailScreen.name}/{uid}/prod={product_id}",
+            arguments = listOf(
+                navArgument(name = "uid") {
+                    type = NavType.StringType
+                },
+                navArgument(name = "product_id") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val target_uid = it.arguments?.getString("uid") ?: ""
+            val product_id = it.arguments?.getString("product_id") ?: ""
+
+            ChatDetailScreen(
+                navController = navController,
+                target_uid = target_uid,
+                product_id = product_id
+            )
+        }
+
+        composable(
+            route = "${AppNavRoute.ChatDetailScreen.name}/{uid}/req={permintaan_id}",
+            arguments = listOf(
+                navArgument(name = "uid") {
+                    type = NavType.StringType
+                },
+                navArgument(name = "permintaan_id") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val target_uid = it.arguments?.getString("uid") ?: ""
+            val permintaan_id = it.arguments?.getString("permintaan_id") ?: ""
+
+            ChatDetailScreen(
+                navController = navController,
+                target_uid = target_uid,
+                permintaan_id = permintaan_id
+            )
+        }
+
+        composable(route = AppNavRoute.ProductOfMerchantScreen.name) {
+            ProductOfMerchantScreen(navController = navController, mainViewModel = mainViewModel)
+        }
+
+        composable(route = AppNavRoute.AddProductScreen.name){
+            AddProductScreen(navController = navController)
         }
     }
 }
