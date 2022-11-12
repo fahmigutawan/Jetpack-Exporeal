@@ -2,7 +2,6 @@ package com.bcc.exporeal.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -11,17 +10,14 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.bcc.exporeal.model.*
-import com.bcc.exporeal.util.FcmRoutes
+import com.bcc.exporeal.util.FcmCred
 import com.bcc.exporeal.util.GetResponse
 import com.bcc.exporeal.util.Resource
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserInfo
 import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.RemoteMessage
-import com.google.firebase.messaging.ktx.remoteMessage
 import com.google.firebase.storage.FirebaseStorage
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -720,9 +716,9 @@ class AppRepository @Inject constructor(
             )
         )
 
-        url(FcmRoutes.fcmUrl)
+        url(FcmCred.fcmUrl)
         contentType(ContentType.Application.Json)
-        header("Authorization", "Bearer ${FcmRoutes.fcmServerKey}")
+        header("Authorization", "Bearer ${FcmCred.fcmServerKey}")
         body = req
     }
 

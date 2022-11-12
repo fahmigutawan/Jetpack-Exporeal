@@ -1,6 +1,7 @@
 package com.bcc.exporeal
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -37,14 +38,14 @@ fun ExporealContent(
     navController: NavHostController,
     mainViewModel: MainViewModel,
     scaffoldState: ScaffoldState,
-    repository: AppRepository
+    repository: AppRepository,
+    intent: Intent
 ) {
     /**Attrs*/
 
     /**Function*/
     navController.addOnDestinationChangedListener { _, destination, _ ->
         destination.route?.let {
-            Log.d("CURRENT ROUTE", it)
             mainViewModel.currentRoute.value = it
 
             when (it) {
@@ -149,7 +150,8 @@ fun ExporealContent(
             modifier = Modifier.padding(bottom = it.calculateBottomPadding()),
             navController = navController,
             mainViewModel = mainViewModel,
-            repository = repository
+            repository = repository,
+            intent = intent
         )
     }
 }
@@ -159,7 +161,8 @@ fun ExporealNavHost(
     navController: NavHostController,
     mainViewModel: MainViewModel,
     modifier: Modifier,
-    repository: AppRepository
+    repository: AppRepository,
+    intent:Intent
 ) {
     NavHost(
         modifier = modifier,
@@ -167,6 +170,9 @@ fun ExporealNavHost(
         startDestination = AppNavRoute.MySplashScreen.name
     ) {
         composable(route = AppNavRoute.MySplashScreen.name) {
+            intent.getStringExtra("uid")?.let {
+                navController.navigate("${AppNavRoute.ChatDetailScreen.name}/$it")
+            }
             MySplashScreen(navController = navController)
         }
 

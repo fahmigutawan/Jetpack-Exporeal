@@ -1,7 +1,9 @@
 package com.bcc.exporeal
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -20,8 +22,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 lateinit var SnackbarListener: @Composable (word: String, state: MutableState<Boolean>) -> SnackbarData?
-@SuppressLint("StaticFieldLeak")
-lateinit var navController: NavHostController
 
 @AndroidEntryPoint
 open class ExporealActivity : ComponentActivity() {
@@ -30,9 +30,10 @@ open class ExporealActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             val mainViewModel: MainViewModel by viewModels()
-            navController = rememberNavController()
+            val navController = rememberNavController()
             val scaffoldState = rememberScaffoldState()
             SnackbarListener = { word, state ->
                 val snackbarHostState = scaffoldState.snackbarHostState
@@ -57,7 +58,8 @@ open class ExporealActivity : ComponentActivity() {
                 navController = navController,
                 mainViewModel = mainViewModel,
                 scaffoldState = scaffoldState,
-                repository = repository
+                repository = repository,
+                intent = intent
             )
         }
     }

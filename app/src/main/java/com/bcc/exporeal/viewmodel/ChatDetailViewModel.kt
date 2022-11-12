@@ -41,18 +41,22 @@ class ChatDetailViewModel @Inject constructor(
         }
     }
 
-    fun getProductByProductId(product_id: String, onResult:(Resource<ProductModel>?) -> Unit) {
+    fun getProductByProductId(product_id: String, onSuccess: (ProductModel) -> Unit) {
         viewModelScope.launch {
             repository.getProductByProductId(product_id, 0L).collect {
-                onResult(it)
+                if(it is Resource.Success){
+                    it.data?.let(onSuccess)
+                }
             }
         }
     }
 
-    fun getPermintaanByPermintaanId(permintaan_id: String, onResult:(Resource<PermintaanModel>?) -> Unit) {
+    fun getPermintaanByPermintaanId(permintaan_id: String, onSuccess: (PermintaanModel) -> Unit) {
         viewModelScope.launch {
             repository.getPermintaanByPermintaanId(permintaan_id, 0L).collect {
-                onResult(it)
+                if(it is Resource.Success){
+                    it.data?.let(onSuccess)
+                }
             }
         }
     }

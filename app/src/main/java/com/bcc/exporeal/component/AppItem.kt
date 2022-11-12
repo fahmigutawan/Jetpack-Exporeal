@@ -670,24 +670,23 @@ fun ChatProductItem(
     mainViewModel: MainViewModel,
     navController: NavController
 ) {
-    val product = remember { mutableStateOf<Resource<ProductModel>?>(Resource.Loading()) }
+    val product = remember { mutableStateOf<ProductModel?>(null) }
     val imgSize = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-    LaunchedEffect(key1 = true) {
-        viewModel.getProductByProductId(
-            product_id = product_id,
-            onResult = {
-                product.value = it
-            }
-        )
+    if(product.value == null){
+        LaunchedEffect(key1 = true) {
+            viewModel.getProductByProductId(
+                product_id = product_id,
+                onSuccess = {
+                    product.value = it
+                }
+            )
+        }
     }
 
     when (product.value) {
-        is Resource.Error -> {
-            /*TODO*/
-        }
-        is Resource.Loading -> {
+        null -> {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -774,7 +773,7 @@ fun ChatProductItem(
                 }
             }
         }
-        is Resource.Success -> {
+        else -> {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -799,7 +798,7 @@ fun ChatProductItem(
                                 .size(imgSize.value)
                                 .clip(RoundedCornerShape(4.dp)),
                             contentScale = ContentScale.Crop,
-                            model = product.value?.data?.product_thumbnail ?: "",
+                            model = product.value?.product_thumbnail ?: "",
                             contentDescription = "Img"
                         )
 
@@ -813,19 +812,19 @@ fun ChatProductItem(
                         ) {
                             // Name
                             AppText(
-                                text = product.value?.data?.product_name ?: "",
+                                text = product.value?.product_name ?: "",
                                 textType = TextType.Body2Semibold
                             )
 
                             // Stock
                             AppText(
-                                text = "${product.value?.data?.product_count ?: 0} ${product.value?.data?.product_unit ?: "pcs"}",
+                                text = "${product.value?.product_count ?: 0} ${product.value?.product_unit ?: "pcs"}",
                                 textType = TextType.Body3
                             )
 
                             // Price
                             AppText(
-                                text = "Rp${product.value?.data?.product_price}/${product.value?.data?.product_unit ?: "pcs"}",
+                                text = "Rp${product.value?.product_price}/${product.value?.product_unit ?: "pcs"}",
                                 textType = TextType.Body2Semibold,
                                 color = AppColor.Warning60
                             )
@@ -837,7 +836,7 @@ fun ChatProductItem(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             mainViewModel.pickedProductToProductDetailScreen.value =
-                                product.value?.data
+                                product.value
 
                             if (mainViewModel.pickedProductToProductDetailScreen.value != null) {
                                 navController.navigate(route = AppNavRoute.ProductDetailScreen.name)
@@ -848,7 +847,6 @@ fun ChatProductItem(
                 }
             }
         }
-        null -> {}
     }
 }
 
@@ -860,24 +858,23 @@ fun ChatPermintaanItem(
     mainViewModel: MainViewModel,
     navController: NavController
 ) {
-    val permintaan = remember { mutableStateOf<Resource<PermintaanModel>?>(Resource.Loading()) }
+    val permintaan = remember { mutableStateOf<PermintaanModel?>(null) }
     val imgSize = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-    LaunchedEffect(key1 = true) {
-        viewModel.getPermintaanByPermintaanId(
-            permintaan_id = permintaan_id,
-            onResult = {
-                permintaan.value = it
-            }
-        )
+    if(permintaan.value == null){
+        LaunchedEffect(key1 = true) {
+            viewModel.getPermintaanByPermintaanId(
+                permintaan_id = permintaan_id,
+                onSuccess = {
+                    permintaan.value = it
+                }
+            )
+        }
     }
 
     when (permintaan.value) {
-        is Resource.Error -> {
-            /*TODO*/
-        }
-        is Resource.Loading -> {
+        null -> {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -964,7 +961,7 @@ fun ChatPermintaanItem(
                 }
             }
         }
-        is Resource.Success -> {
+        else -> {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -989,7 +986,7 @@ fun ChatPermintaanItem(
                                 .size(imgSize.value)
                                 .clip(RoundedCornerShape(4.dp)),
                             contentScale = ContentScale.Crop,
-                            model = permintaan.value?.data?.thumbnail ?: "",
+                            model = permintaan.value?.thumbnail ?: "",
                             contentDescription = "Img"
                         )
 
@@ -1003,19 +1000,19 @@ fun ChatPermintaanItem(
                         ) {
                             // Name
                             AppText(
-                                text = permintaan.value?.data?.name ?: "",
+                                text = permintaan.value?.name ?: "",
                                 textType = TextType.Body2Semibold
                             )
 
                             // Stock
                             AppText(
-                                text = "Order quantity: ${permintaan.value?.data?.quantity ?: 0} ${permintaan.value?.data?.quantity_unit ?: "pcs"}",
+                                text = "Order quantity: ${permintaan.value?.quantity ?: 0} ${permintaan.value?.quantity_unit ?: "pcs"}",
                                 textType = TextType.Body3
                             )
 
                             // Price
                             AppText(
-                                text = "Rp${permintaan.value?.data?.top_price} - RP${permintaan.value?.data?.bottom_price}/${permintaan.value?.data?.quantity_unit ?: "pcs"}",
+                                text = "Rp${permintaan.value?.top_price} - RP${permintaan.value?.bottom_price}/${permintaan.value?.quantity_unit ?: "pcs"}",
                                 textType = TextType.Body2Semibold,
                                 color = AppColor.Warning60
                             )
@@ -1027,7 +1024,7 @@ fun ChatPermintaanItem(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             mainViewModel.pickedPermintaanToPermintaanDetailScreen.value =
-                                permintaan.value?.data
+                                permintaan.value
 
                             if (mainViewModel.pickedPermintaanToPermintaanDetailScreen.value != null) {
                                 navController.navigate(route = AppNavRoute.PermintaanDetailScreen.name)
@@ -1038,6 +1035,5 @@ fun ChatPermintaanItem(
                 }
             }
         }
-        null -> {}
     }
 }

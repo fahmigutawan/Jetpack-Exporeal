@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.bcc.exporeal.R
 import com.bcc.exporeal.component.*
 import com.bcc.exporeal.model.ChatItemModel
 import com.bcc.exporeal.model.UserModel
@@ -248,12 +249,11 @@ fun ChatDetailScreen(
                                                         viewModel.withItem.value = ""
 
                                                         // Send notification
-                                                        val tmpChat = viewModel.chatInputState.value
                                                         viewModel.getTargetFcmToken(target_uid) { token ->
                                                             viewModel.sendNotification(
                                                                 my_name = user.value?.data?.name
                                                                     ?: "",
-                                                                my_message = tmpChat,
+                                                                my_message = chatTmp,
                                                                 target_token = token
                                                             )
                                                         }
@@ -293,11 +293,10 @@ fun ChatDetailScreen(
                                                 viewModel.withItem.value = ""
 
                                                 // Send notification
-                                                val tmpChat = viewModel.chatInputState.value
                                                 viewModel.getTargetFcmToken(target_uid) { token ->
                                                     viewModel.sendNotification(
                                                         my_name = user.value?.data?.name ?: "",
-                                                        my_message = tmpChat,
+                                                        my_message = chatTmp,
                                                         target_token = token
                                                     )
                                                 }
@@ -479,14 +478,25 @@ private fun ChatBubbleOther(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Profile Pic
-            AsyncImage(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                model = pic_url,
-                contentDescription = "Profile Pic"
-            )
+            if(pic_url.isNotEmpty()){
+                AsyncImage(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    model = pic_url,
+                    contentDescription = "Profile Pic"
+                )
+            }else{
+                AsyncImage(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    model = R.drawable.ic_profile_pic,
+                    contentDescription = "Profile Pic"
+                )
+            }
 
             // Bubble
             Box(
