@@ -393,6 +393,7 @@ class AppRepository @Inject constructor(
                     channel_id = channel_id,
                     sender = sender,
                     receiver = receiver,
+                    count = count.toInt(),
                     chat = chat,
                     product_id = product_id,
                     permintaan_id = permintaan_id
@@ -436,6 +437,7 @@ class AppRepository @Inject constructor(
             .child("chat")
             .child(channel_id)
             .child("chat_room")
+            .orderByChild("count")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     onDataChange(snapshot)
@@ -713,7 +715,8 @@ class AppRepository @Inject constructor(
             to = target_token,
             data = Notification(
                 body = my_message,
-                title = my_name
+                title = my_name,
+                tag = getCurrentUid()
             )
         )
 
@@ -722,4 +725,16 @@ class AppRepository @Inject constructor(
         header("Authorization", "Bearer ${FcmRoutes.fcmServerKey}")
         body = req
     }
+
+    // (FIRESTORE) GET product by product_id
+    fun getProductByProductId(product_id: String, delay: Long = 2500L):Flow<Resource<ProductModel>?> =
+        getResponse.getFirestoreResponse(timeDelay = delay) {
+            firestoreDb.collection("product").document(product_id).get()
+        }
+
+    // (FIRESTORE) GET permintaan by permintaan_id
+    fun getPermintaanByPermintaanId(permintaan_id: String, delay: Long = 2500L):Flow<Resource<PermintaanModel>?> =
+        getResponse.getFirestoreResponse(timeDelay = delay) {
+            firestoreDb.collection("permintaan").document(permintaan_id).get()
+        }
 }

@@ -22,15 +22,19 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.bcc.exporeal.R
 import com.bcc.exporeal.model.CategoryModel
 import com.bcc.exporeal.model.PermintaanModel
 import com.bcc.exporeal.model.ProductModel
 import com.bcc.exporeal.model.UserModel
+import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.util.Resource
+import com.bcc.exporeal.viewmodel.ChatDetailViewModel
+import com.bcc.exporeal.viewmodel.MainViewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
@@ -655,5 +659,385 @@ fun AddProductImagePreview(
             contentDescription = "Delete",
             tint = AppColor.Negative60
         )
+    }
+}
+
+@Composable
+fun ChatProductItem(
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    product_id: String,
+    viewModel: ChatDetailViewModel,
+    mainViewModel: MainViewModel,
+    navController: NavController
+) {
+    val product = remember { mutableStateOf<Resource<ProductModel>?>(Resource.Loading()) }
+    val imgSize = remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+
+    LaunchedEffect(key1 = true) {
+        viewModel.getProductByProductId(
+            product_id = product_id,
+            onResult = {
+                product.value = it
+            }
+        )
+    }
+
+    when (product.value) {
+        is Resource.Error -> {
+            /*TODO*/
+        }
+        is Resource.Loading -> {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(AppColor.Blue10)
+                    .border(width = 1.dp, color = AppColor.Blue60, shape = RoundedCornerShape(8.dp))
+            ) {
+                Column(
+                    modifier = modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Title
+                    ChatItemTag(word = "Product")
+
+                    // Content
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Image
+                        Box(
+                            modifier = Modifier
+                                .size(imgSize.value)
+                                .clip(RoundedCornerShape(4.dp))
+                                .placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                        )
+
+                        Column(
+                            modifier = Modifier.onSizeChanged {
+                                with(density) {
+                                    imgSize.value = it.height.toDp()
+                                }
+                            },
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            // Name
+                            AppText(
+                                modifier = Modifier.placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                ),
+                                text = "Product name",
+                                textType = TextType.Body3
+                            )
+
+                            // Stock
+                            AppText(
+                                modifier = Modifier.placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                ),
+                                text = "Stock",
+                                textType = TextType.Body3
+                            )
+
+                            // Price
+                            AppText(
+                                modifier = Modifier.placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                ),
+                                text = "Product price",
+                                textType = TextType.Body3
+                            )
+                        }
+                    }
+
+                    // Open btn
+                    AppButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { /*TODO*/ },
+                        text = "OPEN PRODUCT"
+                    )
+                }
+            }
+        }
+        is Resource.Success -> {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(AppColor.Blue10)
+                    .border(width = 1.dp, color = AppColor.Blue60, shape = RoundedCornerShape(8.dp))
+            ) {
+                Column(
+                    modifier = modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Title
+                    ChatItemTag(word = "Product")
+
+                    // Content
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Image
+                        AsyncImage(
+                            modifier = Modifier
+                                .size(imgSize.value)
+                                .clip(RoundedCornerShape(4.dp)),
+                            contentScale = ContentScale.Crop,
+                            model = product.value?.data?.product_thumbnail ?: "",
+                            contentDescription = "Img"
+                        )
+
+                        Column(
+                            modifier = Modifier.onSizeChanged {
+                                with(density) {
+                                    imgSize.value = it.height.toDp()
+                                }
+                            },
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            // Name
+                            AppText(
+                                text = product.value?.data?.product_name ?: "",
+                                textType = TextType.Body2Semibold
+                            )
+
+                            // Stock
+                            AppText(
+                                text = "${product.value?.data?.product_count ?: 0} ${product.value?.data?.product_unit ?: "pcs"}",
+                                textType = TextType.Body3
+                            )
+
+                            // Price
+                            AppText(
+                                text = "Rp${product.value?.data?.product_price}/${product.value?.data?.product_unit ?: "pcs"}",
+                                textType = TextType.Body2Semibold,
+                                color = AppColor.Warning60
+                            )
+                        }
+                    }
+
+                    // Open btn
+                    AppButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            mainViewModel.pickedProductToProductDetailScreen.value =
+                                product.value?.data
+
+                            if (mainViewModel.pickedProductToProductDetailScreen.value != null) {
+                                navController.navigate(route = AppNavRoute.ProductDetailScreen.name)
+                            }
+                        },
+                        text = "OPEN PRODUCT"
+                    )
+                }
+            }
+        }
+        null -> {}
+    }
+}
+
+@Composable
+fun ChatPermintaanItem(
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    permintaan_id: String,
+    viewModel: ChatDetailViewModel,
+    mainViewModel: MainViewModel,
+    navController: NavController
+) {
+    val permintaan = remember { mutableStateOf<Resource<PermintaanModel>?>(Resource.Loading()) }
+    val imgSize = remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+
+    LaunchedEffect(key1 = true) {
+        viewModel.getPermintaanByPermintaanId(
+            permintaan_id = permintaan_id,
+            onResult = {
+                permintaan.value = it
+            }
+        )
+    }
+
+    when (permintaan.value) {
+        is Resource.Error -> {
+            /*TODO*/
+        }
+        is Resource.Loading -> {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(AppColor.Blue10)
+                    .border(width = 1.dp, color = AppColor.Blue60, shape = RoundedCornerShape(8.dp))
+            ) {
+                Column(
+                    modifier = modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Title
+                    ChatItemTag(word = "Request")
+
+                    // Content
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Image
+                        Box(
+                            modifier = Modifier
+                                .size(imgSize.value)
+                                .clip(RoundedCornerShape(4.dp))
+                                .placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                        )
+
+                        Column(
+                            modifier = Modifier.onSizeChanged {
+                                with(density) {
+                                    imgSize.value = it.height.toDp()
+                                }
+                            },
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            // Name
+                            AppText(
+                                modifier = Modifier.placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                ),
+                                text = "Product name",
+                                textType = TextType.Body3
+                            )
+
+                            // Stock
+                            AppText(
+                                modifier = Modifier.placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                ),
+                                text = "Stock",
+                                textType = TextType.Body3
+                            )
+
+                            // Price
+                            AppText(
+                                modifier = Modifier.placeholder(
+                                    visible = true,
+                                    color = AppColor.Neutral50,
+                                    highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
+                                    shape = RoundedCornerShape(4.dp)
+                                ),
+                                text = "Product price",
+                                textType = TextType.Body3
+                            )
+                        }
+                    }
+
+                    // Open btn
+                    AppButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { },
+                        text = "OPEN PRODUCT"
+                    )
+                }
+            }
+        }
+        is Resource.Success -> {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(AppColor.Blue10)
+                    .border(width = 1.dp, color = AppColor.Blue60, shape = RoundedCornerShape(8.dp))
+            ) {
+                Column(
+                    modifier = modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Title
+                    ChatItemTag(word = "Request")
+
+                    // Content
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Image
+                        AsyncImage(
+                            modifier = Modifier
+                                .size(imgSize.value)
+                                .clip(RoundedCornerShape(4.dp)),
+                            contentScale = ContentScale.Crop,
+                            model = permintaan.value?.data?.thumbnail ?: "",
+                            contentDescription = "Img"
+                        )
+
+                        Column(
+                            modifier = Modifier.onSizeChanged {
+                                with(density) {
+                                    imgSize.value = it.height.toDp()
+                                }
+                            },
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            // Name
+                            AppText(
+                                text = permintaan.value?.data?.name ?: "",
+                                textType = TextType.Body2Semibold
+                            )
+
+                            // Stock
+                            AppText(
+                                text = "Order quantity: ${permintaan.value?.data?.quantity ?: 0} ${permintaan.value?.data?.quantity_unit ?: "pcs"}",
+                                textType = TextType.Body3
+                            )
+
+                            // Price
+                            AppText(
+                                text = "Rp${permintaan.value?.data?.top_price} - RP${permintaan.value?.data?.bottom_price}/${permintaan.value?.data?.quantity_unit ?: "pcs"}",
+                                textType = TextType.Body2Semibold,
+                                color = AppColor.Warning60
+                            )
+                        }
+                    }
+
+                    // Open btn
+                    AppButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            mainViewModel.pickedPermintaanToPermintaanDetailScreen.value =
+                                permintaan.value?.data
+
+                            if (mainViewModel.pickedPermintaanToPermintaanDetailScreen.value != null) {
+                                navController.navigate(route = AppNavRoute.PermintaanDetailScreen.name)
+                            }
+                        },
+                        text = "OPEN PRODUCT"
+                    )
+                }
+            }
+        }
+        null -> {}
     }
 }

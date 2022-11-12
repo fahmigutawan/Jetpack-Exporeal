@@ -4,6 +4,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bcc.exporeal.model.PermintaanModel
+import com.bcc.exporeal.model.ProductModel
 import com.bcc.exporeal.model.UserModel
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.util.Resource
@@ -24,6 +26,8 @@ class ChatDetailViewModel @Inject constructor(
     val shouldCreateNew = mutableStateOf(false)
     val chatInputState = mutableStateOf("")
     val withItem = mutableStateOf("")
+    val shouldLoadId = mutableStateOf(true)
+    val isProcessSending = mutableStateOf(false)
 
     private val _target_user = MutableStateFlow<Resource<UserModel>?>(Resource.Loading())
     val target_user get() = _target_user
@@ -34,6 +38,22 @@ class ChatDetailViewModel @Inject constructor(
     fun getTargetUserInfo(uid: String) = viewModelScope.launch {
         repository.getUserInfoByUid(uid = uid, delay = 0L).collect {
             _target_user.value = it
+        }
+    }
+
+    fun getProductByProductId(product_id: String, onResult:(Resource<ProductModel>?) -> Unit) {
+        viewModelScope.launch {
+            repository.getProductByProductId(product_id, 0L).collect {
+                onResult(it)
+            }
+        }
+    }
+
+    fun getPermintaanByPermintaanId(permintaan_id: String, onResult:(Resource<PermintaanModel>?) -> Unit) {
+        viewModelScope.launch {
+            repository.getPermintaanByPermintaanId(permintaan_id, 0L).collect {
+                onResult(it)
+            }
         }
     }
 
@@ -117,7 +137,7 @@ class ChatDetailViewModel @Inject constructor(
         my_name: String,
         my_message: String,
         target_token: String
-    ){
+    ) {
         viewModelScope.launch {
             repository.sendCloudNotification(my_name, my_message, target_token)
         }
@@ -125,7 +145,7 @@ class ChatDetailViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.getOwnUserInfo(0L).collect{
+            repository.getOwnUserInfo(0L).collect {
                 _user.value = it
             }
         }

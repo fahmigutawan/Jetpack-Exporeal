@@ -41,3 +41,32 @@ fun CategoryTag(
         )
     }
 }
+
+@Composable
+fun ChatItemTag(
+    word:String
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(Int.MAX_VALUE.dp))
+            .border(
+                color = AppColor.Blue60,
+                shape = RoundedCornerShape(Int.MAX_VALUE.dp),
+                width = 1.dp
+            )
+            .background(
+                color = AppColor.Blue10
+            )
+            .padding(
+                vertical = 4.dp,
+                horizontal = 6.dp
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        AppText(
+            text = word,
+            textType = TextType.Body3,
+            color = AppColor.Blue60
+        )
+    }
+}

@@ -26,15 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.bcc.exporeal.component.AppButton
-import com.bcc.exporeal.component.AppText
-import com.bcc.exporeal.component.AppTextInputField
-import com.bcc.exporeal.component.TextType
+import com.bcc.exporeal.component.*
 import com.bcc.exporeal.model.ChatItemModel
 import com.bcc.exporeal.model.UserModel
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.util.Resource
 import com.bcc.exporeal.viewmodel.ChatDetailViewModel
+import com.bcc.exporeal.viewmodel.MainViewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
@@ -47,8 +45,10 @@ fun ChatDetailScreen(
     navController: NavController,
     target_uid: String,
     product_id: String = "",
-    permintaan_id: String = ""
+    permintaan_id: String = "",
+    mainViewModel: MainViewModel
 ) {
+
     /**Attrs*/
     val viewModel = hiltViewModel<ChatDetailViewModel>()
     val targetUser = viewModel.target_user.collectAsState()
@@ -58,12 +58,16 @@ fun ChatDetailScreen(
         rememberSwipeRefreshState(isRefreshing = viewModel.chatRoomSnapshot.value == null)
 
     /**Function*/
-    LaunchedEffect(key1 = true) {
-        if (product_id.isNotEmpty()) {
-            viewModel.withItem.value = product_id
-        }
-        if (permintaan_id.isNotEmpty()) {
-            viewModel.withItem.value = permintaan_id
+    if (viewModel.shouldLoadId.value) {
+        LaunchedEffect(key1 = true) {
+            if (product_id.isNotEmpty()) {
+                viewModel.withItem.value = product_id
+                viewModel.shouldLoadId.value = false
+            }
+            if (permintaan_id.isNotEmpty()) {
+                viewModel.withItem.value = permintaan_id
+                viewModel.shouldLoadId.value = false
+            }
         }
     }
     if (targetUser.value is Resource.Loading) {
@@ -177,6 +181,30 @@ fun ChatDetailScreen(
         },
         bottomBar = {
             Column {
+                // Item if picked
+                when {
+                    product_id.isNotEmpty()
+                            && viewModel.withItem.value.isNotEmpty() -> {
+                        ChatProductItem(
+                            product_id = viewModel.withItem.value,
+                            viewModel = viewModel,
+                            mainViewModel = mainViewModel,
+                            navController = navController
+                        )
+                    }
+
+                    permintaan_id.isNotEmpty()
+                            && viewModel.withItem.value.isNotEmpty() -> {
+                        ChatPermintaanItem(
+                            permintaan_id = viewModel.withItem.value,
+                            viewModel = viewModel,
+                            mainViewModel = mainViewModel,
+                            navController = navController
+                        )
+                    }
+                }
+
+                // Chat item
                 Box(
                     modifier = Modifier
                         .heightIn(max = 250.dp)
@@ -201,34 +229,39 @@ fun ChatDetailScreen(
 
                         AppButton(
                             onClick = {
-                                if (viewModel.chatInputState.value.isNotEmpty()) {
+                                val chatTmp = viewModel.chatInputState.value.trim()
+                                viewModel.chatInputState.value = ""
+                                if (chatTmp.isNotEmpty()) {
                                     if (viewModel.shouldCreateNew.value) {
                                         viewModel.createChannelId(
                                             user_1 = viewModel.getCurrentUid(),
                                             user_2 = target_uid,
                                             onSuccess = {
-                                                // Send notification
-                                                val tmpChat = viewModel.chatInputState.value
-                                                viewModel.getTargetFcmToken(target_uid) { token ->
-                                                    viewModel.sendNotification(
-                                                        my_name = user.value?.data?.name ?: "",
-                                                        my_message = tmpChat,
-                                                        target_token = token
-                                                    )
-                                                }
-
-                                                // Set firestore
                                                 viewModel.sendMessage(
                                                     channel_id = it,
-                                                    chat = viewModel.chatInputState.value,
+                                                    chat = chatTmp,
                                                     sender = viewModel.getCurrentUid(),
                                                     receiver = target_uid,
                                                     product_id = if (product_id.isNotEmpty()) viewModel.withItem.value else "",
                                                     permintaan_id = if (permintaan_id.isNotEmpty()) viewModel.withItem.value else "",
                                                     onSuccess = {
+                                                        viewModel.withItem.value = ""
+
+                                                        // Send notification
+                                                        val tmpChat = viewModel.chatInputState.value
+                                                        viewModel.getTargetFcmToken(target_uid) { token ->
+                                                            viewModel.sendNotification(
+                                                                my_name = user.value?.data?.name
+                                                                    ?: "",
+                                                                my_message = tmpChat,
+                                                                target_token = token
+                                                            )
+                                                        }
+
+                                                        // Set firestore
                                                         viewModel.updateLastChatOnFirestore(
                                                             channel_id = viewModel.chatChannelId.value,
-                                                            last_chat = viewModel.chatInputState.value,
+                                                            last_chat = chatTmp,
                                                             onSuccess = {
                                                                 viewModel.withItem.value = ""
                                                                 viewModel.shouldCreateNew.value =
@@ -251,12 +284,14 @@ fun ChatDetailScreen(
                                     } else {
                                         viewModel.sendMessage(
                                             channel_id = viewModel.chatChannelId.value,
-                                            chat = viewModel.chatInputState.value,
+                                            chat = chatTmp,
                                             sender = viewModel.getCurrentUid(),
                                             receiver = target_uid,
-                                            product_id = product_id,
-                                            permintaan_id = permintaan_id,
+                                            product_id = if (product_id.isNotEmpty()) viewModel.withItem.value else "",
+                                            permintaan_id = if (permintaan_id.isNotEmpty()) viewModel.withItem.value else "",
                                             onSuccess = {
+                                                viewModel.withItem.value = ""
+
                                                 // Send notification
                                                 val tmpChat = viewModel.chatInputState.value
                                                 viewModel.getTargetFcmToken(target_uid) { token ->
@@ -270,7 +305,7 @@ fun ChatDetailScreen(
                                                 // Set firestore
                                                 viewModel.updateLastChatOnFirestore(
                                                     channel_id = viewModel.chatChannelId.value,
-                                                    last_chat = viewModel.chatInputState.value,
+                                                    last_chat = chatTmp,
                                                     onSuccess = {
                                                         viewModel.withItem.value = ""
                                                         viewModel.shouldCreateNew.value = false
@@ -304,7 +339,8 @@ fun ChatDetailScreen(
                 navController = navController,
                 viewModel = viewModel,
                 targetUser = targetUser,
-                paddingValues = it
+                paddingValues = it,
+                mainViewModel = mainViewModel
             )
         }
     }
@@ -315,7 +351,8 @@ private fun ChatDetailContent(
     navController: NavController,
     viewModel: ChatDetailViewModel,
     targetUser: State<Resource<UserModel>?>,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    mainViewModel: MainViewModel
 ) {
     Box(
         modifier = Modifier
@@ -325,33 +362,66 @@ private fun ChatDetailContent(
     ) {
         LazyColumn(
             modifier = Modifier
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            reverseLayout = true
         ) {
             item {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
             }
 
             viewModel.chatRoomSnapshot.value?.let {
-                items(items = it.children.toList()) { item ->
+                items(items = it.children.toList().asReversed()) { item ->
                     item?.let { chatRef ->
                         val chat = chatRef.getValue(ChatItemModel::class.java)
-                        Log.e("CHAT", chat.toString())
 
                         if (targetUser.value is Resource.Success) {
                             chat?.sender?.let { senderUid ->
-                                when {
-                                    (senderUid.equals(targetUser.value?.data?.uid ?: "")) -> {
-                                        ChatBubbleOther(
-                                            chat = chat.chat ?: "",
-                                            pic_url = targetUser.value?.data?.profile_pic ?: ""
-                                        )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    // If there is any product item
+                                    when {
+                                        (chat.product_id ?: "").isNotEmpty() -> {
+                                            ChatProductItem(
+                                                product_id = (chat.product_id ?: ""),
+                                                viewModel = viewModel,
+                                                mainViewModel = mainViewModel,
+                                                navController = navController
+                                            )
+                                        }
+
+                                        (chat.permintaan_id ?: "").isNotEmpty() -> {
+                                            ChatPermintaanItem(
+                                                permintaan_id = (chat.permintaan_id ?: ""),
+                                                viewModel = viewModel,
+                                                mainViewModel = mainViewModel,
+                                                navController = navController
+                                            )
+                                        }
                                     }
 
-                                    else -> {
-                                        ChatBubbleMe(
-                                            chat = chat.chat ?: ""
-                                        )
+                                    // Chat bubble
+                                    when {
+                                        (senderUid.equals(targetUser.value?.data?.uid ?: "")) -> {
+                                            ChatBubbleOther(
+                                                chat = chat.chat ?: "",
+                                                pic_url = targetUser.value?.data?.profile_pic ?: "",
+                                                product_id = chat.product_id ?: "",
+                                                permintaan_id = chat.permintaan_id ?: ""
+                                            )
+                                        }
+
+                                        else -> {
+                                            ChatBubbleMe(
+                                                chat = chat.chat ?: "",
+                                                product_id = chat.product_id ?: "",
+                                                permintaan_id = chat.permintaan_id ?: ""
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -368,7 +438,7 @@ private fun ChatDetailContent(
 }
 
 @Composable
-private fun ChatBubbleMe(chat: String) {
+private fun ChatBubbleMe(chat: String, product_id: String, permintaan_id: String) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -392,20 +462,17 @@ private fun ChatBubbleMe(chat: String) {
                     color = Color.Black
                 )
             }
-
-//            // Profile Pic
-//            AsyncImage(
-//                modifier = Modifier.size(24.dp),
-//                contentScale = ContentScale.Crop,
-//                model = pic_url,
-//                contentDescription = "Profile Pic"
-//            )
         }
     }
 }
 
 @Composable
-private fun ChatBubbleOther(chat: String, pic_url: String) {
+private fun ChatBubbleOther(
+    chat: String,
+    pic_url: String,
+    product_id: String,
+    permintaan_id: String
+) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

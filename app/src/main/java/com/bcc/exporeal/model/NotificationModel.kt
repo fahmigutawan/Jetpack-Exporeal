@@ -11,5 +11,6 @@ data class NotificationModel(
 @Serializable
 data class Notification(
     val body:String,
-    val title:String
+    val title:String,
+    val tag:String
 )

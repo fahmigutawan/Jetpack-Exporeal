@@ -199,7 +199,7 @@ fun ExporealNavHost(
         composable(
             route = "${AppNavRoute.MarketScreen.name}/tab={tab}",
             arguments = listOf(
-                navArgument("tab"){ type = NavType.StringType }
+                navArgument("tab") { type = NavType.StringType }
             )
         ) {
             val tab = it.arguments?.getString("tab") ?: ""
@@ -214,8 +214,8 @@ fun ExporealNavHost(
         composable(
             route = "${AppNavRoute.MarketScreen.name}/tab={tab}/category_id={category_id}",
             arguments = listOf(
-                navArgument("tab"){ type = NavType.StringType },
-                navArgument("category_id"){ type = NavType.StringType }
+                navArgument("tab") { type = NavType.StringType },
+                navArgument("category_id") { type = NavType.StringType }
             )
         ) {
             val tab = it.arguments?.getString("tab") ?: ""
@@ -267,7 +267,11 @@ fun ExporealNavHost(
         ) {
             val target_uid = it.arguments?.getString("uid") ?: ""
 
-            ChatDetailScreen(navController = navController, target_uid = target_uid)
+            ChatDetailScreen(
+                navController = navController,
+                target_uid = target_uid,
+                mainViewModel = mainViewModel
+            )
         }
 
         composable(
@@ -287,7 +291,8 @@ fun ExporealNavHost(
             ChatDetailScreen(
                 navController = navController,
                 target_uid = target_uid,
-                product_id = product_id
+                product_id = product_id,
+                mainViewModel = mainViewModel
             )
         }
 
@@ -308,7 +313,8 @@ fun ExporealNavHost(
             ChatDetailScreen(
                 navController = navController,
                 target_uid = target_uid,
-                permintaan_id = permintaan_id
+                permintaan_id = permintaan_id,
+                mainViewModel = mainViewModel
             )
         }
 
@@ -316,7 +322,7 @@ fun ExporealNavHost(
             ProductOfMerchantScreen(navController = navController, mainViewModel = mainViewModel)
         }
 
-        composable(route = AppNavRoute.AddProductScreen.name){
+        composable(route = AppNavRoute.AddProductScreen.name) {
             AddProductScreen(navController = navController)
         }
     }
