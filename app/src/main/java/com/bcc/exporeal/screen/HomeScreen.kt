@@ -282,7 +282,9 @@ private fun HomeContent(
                         category.value?.data?.let {
                             it.forEach { categoryModel ->
                                 Column(
-                                    modifier = Modifier,
+                                    modifier = Modifier.clickable {
+                                        navController.navigate(route = "${AppNavRoute.MarketScreen.name}/tab=produk/category_id=${categoryModel.category_id}")
+                                    },
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
@@ -322,7 +324,9 @@ private fun HomeContent(
                 AppTextButton(
                     text = "Lihat semua",
                     textType = TextType.Body3Semibold,
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        navController.navigate(route = "${AppNavRoute.MarketScreen.name}/tab=produk")
+                    },
                     color = AppColor.Blue60
                 )
             }
@@ -380,7 +384,9 @@ private fun HomeContent(
                 AppTextButton(
                     text = "Lihat semua",
                     textType = TextType.Body3Semibold,
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        navController.navigate(route = "${AppNavRoute.MarketScreen.name}/tab=permintaan")
+                    },
                     color = AppColor.Blue60
                 )
             }

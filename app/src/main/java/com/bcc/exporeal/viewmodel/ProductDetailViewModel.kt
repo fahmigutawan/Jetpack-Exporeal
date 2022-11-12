@@ -21,6 +21,7 @@ class ProductDetailViewModel @Inject constructor(
     val expandDescription = mutableStateOf(false)
     val showSnackbar = mutableStateOf(false)
     val snackbarMessage = mutableStateOf("")
+    val searchState = mutableStateOf("")
 
     private val _productPictures =
         MutableStateFlow<Resource<List<ProductPictureModel>>?>(Resource.Loading())

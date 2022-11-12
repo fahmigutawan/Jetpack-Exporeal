@@ -1,5 +1,6 @@
 package com.bcc.exporeal.component
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
@@ -36,7 +37,7 @@ fun AppBottomBar(
         ) {
             BottomBarItem.values().forEach {
                 AnimatedContent(
-                    targetState = currentRoute.equals(it.route),
+                    targetState = it.listOfRoute.contains(currentRoute),
                     transitionSpec = {
                         fadeIn(tween(200)) with fadeOut(tween(200))
                     }
@@ -46,7 +47,9 @@ fun AppBottomBar(
                             Box(
                                 modifier = Modifier
                                     .width(itemWidth.dp)
-                                    .clickable { onItemClicked(it.route) },
+                                    .clickable {
+                                        onItemClicked(it.listOfRoute[0])
+                                    },
                                 contentAlignment = Alignment.BottomCenter
                             ) {
                                 // Menu Item
@@ -78,7 +81,9 @@ fun AppBottomBar(
                             Box(
                                 modifier = Modifier
                                     .width(itemWidth.dp)
-                                    .clickable { onItemClicked(it.route) },
+                                    .clickable {
+                                        onItemClicked(it.listOfRoute[0])
+                                    },
                                 contentAlignment = Alignment.BottomCenter
                             ) {
                                 // Menu Item
@@ -108,28 +113,35 @@ fun AppBottomBar(
 }
 
 enum class BottomBarItem(
-    val route: String, val iconSelectedId: Int, val iconUnselectedId: Int, val word: String
+    val listOfRoute: List<String>,
+    val iconSelectedId: Int,
+    val iconUnselectedId: Int,
+    val word: String
 ) {
     Home(
-        route = AppNavRoute.HomeScreen.name,
+        listOfRoute = listOf(AppNavRoute.HomeScreen.name),
         iconSelectedId = R.drawable.ic_botmenu_home_selected,
         iconUnselectedId = R.drawable.ic_botmenu_home_unselected,
         word = "Home"
     ),
     Market(
-        route = AppNavRoute.MarketScreen.name,
+        listOfRoute = listOf(
+            AppNavRoute.MarketScreen.name,
+            "${AppNavRoute.MarketScreen.name}/tab={tab}",
+            "${AppNavRoute.MarketScreen.name}/tab={tab}/category_id={category_id}"
+        ),
         iconSelectedId = R.drawable.ic_botmenu_market_selected,
         iconUnselectedId = R.drawable.ic_botmenu_market_unselected,
         word = "Market"
     ),
     Pelatihan(
-        route = AppNavRoute.PelatihanScreen.name,
+        listOfRoute = listOf(AppNavRoute.PelatihanScreen.name),
         iconSelectedId = R.drawable.ic_botmenu_training_selected,
         iconUnselectedId = R.drawable.ic_botmenu_training_unselected,
         word = "Pelatihan"
     ),
     Profile(
-        route = AppNavRoute.ProfileScreen.name,
+        listOfRoute = listOf(AppNavRoute.ProfileScreen.name),
         iconSelectedId = R.drawable.ic_botmenu_profile_selected,
         iconUnselectedId = R.drawable.ic_botmenu_profile_unselected,
         word = "Profile"

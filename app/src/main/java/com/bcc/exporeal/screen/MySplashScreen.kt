@@ -1,5 +1,6 @@
 package com.bcc.exporeal.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.viewmodel.MySplashViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun MySplashScreen(
@@ -31,13 +33,16 @@ fun MySplashScreen(
         delay(3000)
         viewModel.hasPassedLandingScreen().collect { hasPassed ->
             if (hasPassed) {
-                if(viewModel.isLoggedIn()){
+                if (viewModel.isLoggedIn()) {
+                    viewModel.getFcmToken {
+                        viewModel.saveFcmTokenToFirestore(it)
+                    }
                     navController.navigate(route = AppNavRoute.HomeScreen.name) {
                         popUpTo(route = AppNavRoute.MySplashScreen.name) {
                             inclusive = true
                         }
                     }
-                }else{
+                } else {
                     navController.navigate(route = AppNavRoute.LoginScreen.name) {
                         popUpTo(route = AppNavRoute.MySplashScreen.name) {
                             inclusive = true

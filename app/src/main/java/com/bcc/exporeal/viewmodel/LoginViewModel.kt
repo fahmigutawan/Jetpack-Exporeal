@@ -18,6 +18,10 @@ class LoginViewModel @Inject constructor(
     val showErrorSnackbar = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
 
+    fun saveFcmTokenToFirestore(token:String) = repository.saveFcmTokenToFirestore(token)
+
+    fun getFcmToken(onSuccess:(String) -> Unit) = repository.getFcmToken(onSuccess)
+
     fun login(onSuccess: () -> Unit, onFailed: () -> Unit) {
         isLoading.value = true
 

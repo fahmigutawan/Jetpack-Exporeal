@@ -320,6 +320,10 @@ private fun RegisterAdvanceContent(
                         else -> {
                             viewModel.register(
                                 onSuccess = {
+                                    viewModel.getFcmToken {
+                                        viewModel.saveFcmTokenToFirestore(it)
+                                    }
+
                                     viewModel.isLoading.value = false
                                     navController.navigate(route = AppNavRoute.HomeScreen.name){
                                         navController.backQueue.clear()

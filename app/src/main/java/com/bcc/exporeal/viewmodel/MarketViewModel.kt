@@ -14,6 +14,7 @@ import com.bcc.exporeal.screen.MarketTopMenuItem
 import com.bcc.exporeal.util.PagingState
 import com.bcc.exporeal.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +32,12 @@ class MarketViewModel @Inject constructor(
     val listOfCategory = mutableStateListOf<Resource<CategoryModel>?>()
     val productPageFinished = mutableStateOf(false)
     val permintaaanPageFinished = mutableStateOf(false)
+    val tabArgumentShouldProceeded = mutableStateOf(true)
+    val categoryArgumentShouldProceeded = mutableStateOf(true)
+    val shouldLoadFirstItems = mutableStateOf(true)
+
+    private val _category = MutableStateFlow<Resource<CategoryModel>?>(Resource.Loading())
+    val category get() = _category
 
     fun loadFirstProducts() = viewModelScope.launch {
         repository.getFirstProductsWithNoFilter().collect{
@@ -55,6 +62,50 @@ class MarketViewModel @Inject constructor(
     fun loadNextProducts() = viewModelScope.launch {
         repository.getNextProductsWithNoFilter(
             lastVisiblePostCount = productList.last().product_count ?: 0
+        ).collect{
+            when(it){
+                is Resource.Error -> {
+                    productPagingState.value = PagingState.NextLoadError
+                }
+                is Resource.Loading -> {
+                    productPagingState.value = PagingState.NextLoad
+                }
+                is Resource.Success -> {
+                    productPagingState.value = PagingState.Success
+                    it.data?.let { list ->
+                        if(list.isEmpty()) productPageFinished.value = true
+                        productList.addAll(list)
+                    }
+                }
+                null -> { }
+            }
+        }
+    }
+
+    fun loadFirstProductsByCategory(category_id: String) = viewModelScope.launch {
+        repository.getFirstProductsByCategoryId(category_id).collect{
+            when(it){
+                is Resource.Error -> {
+                    productPagingState.value = PagingState.NextLoadError
+                }
+                is Resource.Loading -> {
+                    productPagingState.value = PagingState.NextLoad
+                }
+                is Resource.Success -> {
+                    productPagingState.value = PagingState.Success
+                    it.data?.let { list ->
+                        productList.addAll(list)
+                    }
+                }
+                null -> { }
+            }
+        }
+    }
+
+    fun loadNextProductsByCategory(category_id: String) = viewModelScope.launch {
+        repository.getNextProductsByCategoryId(
+            lastVisiblePostCount = productList.last().product_count ?: 0,
+            category_id = category_id
         ).collect{
             when(it){
                 is Resource.Error -> {
@@ -118,6 +169,50 @@ class MarketViewModel @Inject constructor(
         }
     }
 
+    fun loadFirstPermintaanByCategory(category_id: String) = viewModelScope.launch {
+        repository.getFirstPermintaanByCategoryId(category_id).collect{
+            when(it){
+                is Resource.Error -> {
+                    permintaanPagingState.value = PagingState.NextLoadError
+                }
+                is Resource.Loading -> {
+                    permintaanPagingState.value = PagingState.NextLoad
+                }
+                is Resource.Success -> {
+                    permintaanPagingState.value = PagingState.Success
+                    it.data?.let { list ->
+                        permintaanList.addAll(list)
+                    }
+                }
+                null -> { }
+            }
+        }
+    }
+
+    fun loadNextPermintaanByCategory(category_id: String) = viewModelScope.launch {
+        repository.getNextPermintaanByCategoryId(
+            lastVisiblePermintaanCount = permintaanList.last().permintaan_count ?: 0,
+            category_id = category_id
+        ).collect{
+            when(it){
+                is Resource.Error -> {
+                    permintaanPagingState.value = PagingState.NextLoadError
+                }
+                is Resource.Loading -> {
+                    permintaanPagingState.value = PagingState.NextLoad
+                }
+                is Resource.Success -> {
+                    permintaanPagingState.value = PagingState.Success
+                    it.data?.let { list ->
+                        if(list.isEmpty()) permintaaanPageFinished.value = true
+                        permintaanList.addAll(list)
+                    }
+                }
+                null -> { }
+            }
+        }
+    }
+
     fun refreshProduct(){
         productList.clear()
 
@@ -151,6 +246,24 @@ class MarketViewModel @Inject constructor(
         }
     }
 
+    fun getCategoryById(
+        category_id: String
+    ) = viewModelScope.launch {
+        repository.getCategoryByCategoryId(category_id).collect {
+            _category.value = it
+            when(it){
+                is Resource.Error -> {
+                    categoryArgumentShouldProceeded.value = false
+                }
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    categoryArgumentShouldProceeded.value = false
+                }
+                null -> {}
+            }
+        }
+    }
+
     fun getUserById(
         uid: String,
         onSuccess: (UserModel) -> Unit,
@@ -170,10 +283,5 @@ class MarketViewModel @Inject constructor(
                 null -> {}
             }
         }
-    }
-
-    init {
-        loadFirstProducts()
-        loadFirstPermintaan()
     }
 }

@@ -5,15 +5,14 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.runtime.*
@@ -87,7 +86,26 @@ fun PermintaanDetailScreen(
     /**Content*/
     Scaffold(
         topBar = {
+            TopAppBar(backgroundColor = AppColor.Neutral10, elevation = 10.dp) {
+                Row(
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier.clickable { navController.popBackStack() },
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back"
+                    )
 
+                    AppTextInputField(
+                        placeHolderText = "Search",
+                        valueState = viewModel.searchState
+                    )
+                }
+            }
         },
         bottomBar = {
             BottomAppBar(backgroundColor = AppColor.Neutral10, elevation = 10.dp) {

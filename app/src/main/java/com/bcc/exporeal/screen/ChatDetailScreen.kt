@@ -50,6 +50,7 @@ fun ChatDetailScreen(
     /**Attrs*/
     val viewModel = hiltViewModel<ChatDetailViewModel>()
     val targetUser = viewModel.target_user.collectAsState()
+    val user = viewModel.user.collectAsState()
     val density = LocalDensity.current
 
     /**Function*/
@@ -173,7 +174,9 @@ fun ChatDetailScreen(
         },
         bottomBar = {
             Column {
-                Box(modifier = Modifier.heightIn(max = 250.dp).background(AppColor.Neutral20)) {
+                Box(modifier = Modifier
+                    .heightIn(max = 250.dp)
+                    .background(AppColor.Neutral20)) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -199,6 +202,17 @@ fun ChatDetailScreen(
                                             user_1 = viewModel.getCurrentUid(),
                                             user_2 = target_uid,
                                             onSuccess = {
+                                                // Send notification
+                                                val tmpChat = viewModel.chatInputState.value
+                                                viewModel.getTargetFcmToken(target_uid){ token ->
+                                                    viewModel.sendNotification(
+                                                        my_name = user.value?.data?.name ?: "",
+                                                        my_message = tmpChat,
+                                                        target_token = token
+                                                    )
+                                                }
+
+                                                // Set firestore
                                                 viewModel.sendMessage(
                                                     channel_id = it,
                                                     chat = viewModel.chatInputState.value,
@@ -237,6 +251,17 @@ fun ChatDetailScreen(
                                             product_id = product_id,
                                             permintaan_id = permintaan_id,
                                             onSuccess = {
+                                                // Send notification
+                                                val tmpChat = viewModel.chatInputState.value
+                                                viewModel.getTargetFcmToken(target_uid){ token ->
+                                                    viewModel.sendNotification(
+                                                        my_name = user.value?.data?.name ?: "",
+                                                        my_message = tmpChat,
+                                                        target_token = token
+                                                    )
+                                                }
+
+                                                // Set firestore
                                                 viewModel.updateLastChatOnFirestore(
                                                     channel_id = viewModel.chatChannelId.value,
                                                     last_chat = viewModel.chatInputState.value,
@@ -296,7 +321,7 @@ private fun ChatDetailContent(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             viewModel.chatRoomSnapshot.value?.let {
@@ -328,7 +353,7 @@ private fun ChatDetailContent(
             }
 
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(0.dp))
             }
         }
     }
@@ -380,7 +405,9 @@ private fun ChatBubbleOther(chat: String, pic_url: String) {
         ) {
             // Profile Pic
             AsyncImage(
-                modifier = Modifier.size(32.dp).clip(CircleShape),
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 model = pic_url,
                 contentDescription = "Profile Pic"

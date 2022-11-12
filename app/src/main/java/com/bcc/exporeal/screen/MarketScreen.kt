@@ -11,10 +11,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -22,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bcc.exporeal.component.*
+import com.bcc.exporeal.model.CategoryModel
 import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.ui.style.AppColor
 import com.bcc.exporeal.util.PagingState
@@ -32,14 +30,56 @@ import com.bcc.exporeal.viewmodel.MarketViewModel
 @Composable
 fun MarketScreen(
     navController: NavController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    tab: String = "produk",
+    category_id: String = ""
 ) {
     /**Attrs*/
     val viewModel = hiltViewModel<MarketViewModel>()
     val productLazyState = rememberLazyGridState()
     val permintaanLazyState = rememberLazyListState()
+    val category = viewModel.category.collectAsState()
+    val listsAreEmpty = remember {
+        derivedStateOf {
+            viewModel.productList.isEmpty() && viewModel.permintaanList.isEmpty()
+        }
+    }
 
     /**Function*/
+    if (viewModel.tabArgumentShouldProceeded.value) {
+        LaunchedEffect(key1 = true) {
+            when (tab) {
+                "produk" -> {
+                    viewModel.selectedTopMenu.value = MarketTopMenuItem.Produk
+                }
+                "permintaan" -> {
+                    viewModel.selectedTopMenu.value = MarketTopMenuItem.Permintaan
+                }
+            }
+
+            viewModel.tabArgumentShouldProceeded.value = false
+        }
+    }
+    if (viewModel.categoryArgumentShouldProceeded.value && category_id.isNotEmpty()) {
+        LaunchedEffect(key1 = true) {
+            viewModel.getCategoryById(category_id = category_id)
+        }
+    }
+    if (viewModel.shouldLoadFirstItems.value && listsAreEmpty.value) {
+        LaunchedEffect(key1 = true) {
+            when {
+                category_id.isNotEmpty() -> {
+                    viewModel.loadFirstProductsByCategory(category_id)
+                    viewModel.loadFirstPermintaanByCategory(category_id)
+                }
+
+                else -> {
+                    viewModel.loadFirstProducts()
+                    viewModel.loadFirstPermintaan()
+                }
+            }
+        }
+    }
 
     /**Content*/
     MarketContent(
@@ -47,7 +87,9 @@ fun MarketScreen(
         viewModel = viewModel,
         mainViewModel = mainViewModel,
         productLazyState = productLazyState,
-        permintaanLazyState = permintaanLazyState
+        permintaanLazyState = permintaanLazyState,
+        category = category,
+        category_id = category_id
     )
 }
 
@@ -57,18 +99,54 @@ private fun MarketContent(
     viewModel: MarketViewModel,
     mainViewModel: MainViewModel,
     productLazyState: LazyGridState,
-    permintaanLazyState: LazyListState
+    permintaanLazyState: LazyListState,
+    category: State<Resource<CategoryModel>?>,
+    category_id: String
 ) {
     val topMenuWidth = LocalConfiguration.current.screenWidthDp / MarketTopMenuItem.values().size
     val gridItemWidth = LocalConfiguration.current.screenWidthDp / 2
     val queryNextProduct = remember {
         derivedStateOf {
-            viewModel.productList.isNotEmpty() && viewModel.productList.size % 8 == 0 && productLazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == viewModel.productList.size - 1
+            viewModel.productList.isNotEmpty()
+                    && viewModel.productList.size % 8 == 0
+                    && productLazyState
+                .layoutInfo
+                .visibleItemsInfo
+                .lastOrNull()?.index == viewModel.productList.size - 1
+                    && category_id.isEmpty()
+        }
+    }
+    val queryNextProductByCategory = remember {
+        derivedStateOf {
+            viewModel.productList.isNotEmpty()
+                    && viewModel.productList.size % 8 == 0
+                    && productLazyState
+                .layoutInfo
+                .visibleItemsInfo
+                .lastOrNull()?.index == viewModel.productList.size - 1
+                    && category_id.isNotEmpty()
         }
     }
     val queryNextPermintaan = remember {
         derivedStateOf {
-            viewModel.permintaanList.isNotEmpty() && viewModel.permintaanList.size % 8 == 0 && permintaanLazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == viewModel.permintaanList.size - 1
+            viewModel.permintaanList.isNotEmpty()
+                    && viewModel.permintaanList.size % 8 == 0
+                    && permintaanLazyState
+                .layoutInfo
+                .visibleItemsInfo
+                .lastOrNull()?.index == viewModel.permintaanList.size - 1
+                    && category_id.isEmpty()
+        }
+    }
+    val queryNextPermintaanByCategory = remember {
+        derivedStateOf {
+            viewModel.permintaanList.isNotEmpty()
+                    && viewModel.permintaanList.size % 8 == 0
+                    && permintaanLazyState
+                .layoutInfo
+                .visibleItemsInfo
+                .lastOrNull()?.index == viewModel.permintaanList.size - 1
+                    && category_id.isNotEmpty()
         }
     }
 
@@ -84,6 +162,16 @@ private fun MarketContent(
             if (queryNextPermintaan.value) {
                 viewModel.loadNextPermintaan()
             }
+        }
+    }
+    LaunchedEffect(key1 = queryNextProductByCategory.value) {
+        if (queryNextProductByCategory.value) {
+            viewModel.loadNextProductsByCategory(category_id)
+        }
+    }
+    LaunchedEffect(key1 = queryNextPermintaanByCategory.value) {
+        if (queryNextPermintaanByCategory.value) {
+            viewModel.loadNextPermintaanByCategory(category_id)
         }
     }
     LaunchedEffect(key1 = viewModel.permintaanPagingState.value == PagingState.Success) {
@@ -122,7 +210,10 @@ private fun MarketContent(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
         // Produk & Permintaan btn
         TopAppBar(backgroundColor = AppColor.Neutral10) {
             Row(
@@ -165,12 +256,26 @@ private fun MarketContent(
             }
         }
 
+        // Category
+        if (category.value is Resource.Success) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                AppText(text = "Filtered by", textType = TextType.Body3Semibold)
+                category.value?.data?.let {
+                    CategoryTag(categoryModel = it)
+                }
+            }
+        }
+
         // Content
         when (viewModel.selectedTopMenu.value) {
             MarketTopMenuItem.Produk -> {
                 // Items
                 LazyVerticalGrid(
-                    modifier = Modifier.padding(vertical = 16.dp),
+                    modifier = Modifier.padding(bottom = 16.dp),
                     state = productLazyState,
                     columns = GridCells.Fixed(2),
                     horizontalArrangement = Arrangement.Center
@@ -215,7 +320,7 @@ private fun MarketContent(
             MarketTopMenuItem.Permintaan -> {
                 LazyColumn(
                     state = permintaanLazyState,
-                    modifier = Modifier.padding(vertical = 16.dp),
+                    modifier = Modifier.padding(bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(4.dp)
                 ) {
@@ -257,9 +362,9 @@ private fun MarketContent(
                         else -> {
                             if (viewModel.productPagingState.value == PagingState.NextLoad) {
 //                                if (viewModel.permintaanList.isEmpty()) {
-                                    items(6) {
-                                        PermintaanItemLoading()
-                                    }
+                                items(6) {
+                                    PermintaanItemLoading()
+                                }
 //                                }
                             }
                         }

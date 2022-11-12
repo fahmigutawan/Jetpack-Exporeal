@@ -44,7 +44,7 @@ fun ExporealContent(
     /**Function*/
     navController.addOnDestinationChangedListener { _, destination, _ ->
         destination.route?.let {
-            Log.e("CURRENT ROUTE", it)
+            Log.d("CURRENT ROUTE", it)
             mainViewModel.currentRoute.value = it
 
             when (it) {
@@ -54,6 +54,16 @@ fun ExporealContent(
                 }
 
                 AppNavRoute.MarketScreen.name -> {
+                    mainViewModel.showBottomBar.value = true
+                    mainViewModel.showTopBar.value = true
+                }
+
+                "${AppNavRoute.MarketScreen.name}/tab={tab}" -> {
+                    mainViewModel.showBottomBar.value = true
+                    mainViewModel.showTopBar.value = true
+                }
+
+                "${AppNavRoute.MarketScreen.name}/tab={tab}/category_id={category_id}" -> {
                     mainViewModel.showBottomBar.value = true
                     mainViewModel.showTopBar.value = true
                 }
@@ -183,6 +193,39 @@ fun ExporealNavHost(
             MarketScreen(
                 navController = navController,
                 mainViewModel = mainViewModel
+            )
+        }
+
+        composable(
+            route = "${AppNavRoute.MarketScreen.name}/tab={tab}",
+            arguments = listOf(
+                navArgument("tab"){ type = NavType.StringType }
+            )
+        ) {
+            val tab = it.arguments?.getString("tab") ?: ""
+
+            MarketScreen(
+                navController = navController,
+                mainViewModel = mainViewModel,
+                tab = tab
+            )
+        }
+
+        composable(
+            route = "${AppNavRoute.MarketScreen.name}/tab={tab}/category_id={category_id}",
+            arguments = listOf(
+                navArgument("tab"){ type = NavType.StringType },
+                navArgument("category_id"){ type = NavType.StringType }
+            )
+        ) {
+            val tab = it.arguments?.getString("tab") ?: ""
+            val category_id = it.arguments?.getString("category_id") ?: ""
+
+            MarketScreen(
+                navController = navController,
+                mainViewModel = mainViewModel,
+                tab = tab,
+                category_id = category_id
             )
         }
 

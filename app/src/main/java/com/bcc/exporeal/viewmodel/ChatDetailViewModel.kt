@@ -3,6 +3,7 @@ package com.bcc.exporeal.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bcc.exporeal.model.UserModel
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.util.Resource
@@ -26,6 +27,9 @@ class ChatDetailViewModel @Inject constructor(
 
     private val _target_user = MutableStateFlow<Resource<UserModel>?>(Resource.Loading())
     val target_user get() = _target_user
+
+    private val _user = MutableStateFlow<Resource<UserModel>?>(Resource.Loading())
+    val user get() = _user
 
     fun getTargetUserInfo(uid: String) = viewModelScope.launch {
         repository.getUserInfoByUid(uid = uid, delay = 0L).collect {
@@ -94,4 +98,36 @@ class ChatDetailViewModel @Inject constructor(
         onFailed: () -> Unit,
         onSuccess: () -> Unit
     ) = repository.updateLastChatOnFirestore(channel_id, last_chat, onFailed, onSuccess)
+
+    fun getTargetFcmToken(target_uid: String, onSuccess: (String) -> Unit) {
+        viewModelScope.launch {
+            repository.getFcmTokenByUid(target_uid).collect {
+                if (it is Resource.Success) {
+                    it.data?.let {
+                        onSuccess(
+                            it.token!!
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun sendNotification(
+        my_name: String,
+        my_message: String,
+        target_token: String
+    ){
+        viewModelScope.launch {
+            repository.sendCloudNotification(my_name, my_message, target_token)
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            repository.getOwnUserInfo().collect{
+                _user.value = it
+            }
+        }
+    }
 }

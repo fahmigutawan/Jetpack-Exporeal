@@ -8,8 +8,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.bcc.exporeal.model.*
+import com.bcc.exporeal.util.FcmRoutes
 import com.bcc.exporeal.util.GetResponse
 import com.bcc.exporeal.util.Resource
 import com.google.firebase.auth.FirebaseAuth
@@ -17,8 +19,13 @@ import com.google.firebase.auth.UserInfo
 import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
+import com.google.firebase.messaging.ktx.remoteMessage
 import com.google.firebase.storage.FirebaseStorage
 import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -32,7 +39,8 @@ class AppRepository @Inject constructor(
     private val storage: FirebaseStorage,
     private val auth: FirebaseAuth,
     private val getResponse: GetResponse,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val messaging: FirebaseMessaging
 ) {
     val datastore = context.datastore
 
@@ -47,6 +55,36 @@ class AppRepository @Inject constructor(
     val hasPassedLandingScreen = datastore.data.map {
         it[booleanPreferencesKey("HAS_PASSED_LANDING")] ?: false
     }
+
+    // (DATASTORE) SAVE is new token available status
+    suspend fun saveIsNewFcmTokenAvailable(available: Boolean) {
+        datastore.edit {
+            it[booleanPreferencesKey("IS_NEW_TOKEN_AVAILABLE")] = available
+        }
+    }
+
+    // (DATASTORE) GET is new token available status
+    val isNewFcmTokenAvailable = datastore.data.map {
+        it[booleanPreferencesKey("IS_NEW_TOKEN_AVAILABLE")] ?: false
+    }
+
+    // (DATASTORE) SAVE fcm token
+    suspend fun saveFcmToken(token: String) {
+        datastore.edit {
+            it[stringPreferencesKey("FCM_TOKEN")] = token
+        }
+    }
+
+    // (DATASTORE) GET fcm token
+    val fcmToken = datastore.data.map {
+        it[stringPreferencesKey("FCM_TOKEN")] ?: ""
+    }
+
+    // (MESSAGING) get new token
+    fun getFcmToken(onSuccess: (String) -> Unit) {
+        messaging.token.addOnSuccessListener { onSuccess(it) }
+    }
+
 
     // (AUTH) CHECK isLoggedIn
     fun isLoggedIn() = (auth.currentUser != null)
@@ -64,7 +102,14 @@ class AppRepository @Inject constructor(
 
     // (AUTH) Logout
     suspend fun logout(delay: Long = 2000L, afterDelay: () -> Unit) {
+        firestoreDb
+            .collection("fcm_token")
+            .document(getCurrentUid())
+            .delete()
+
         auth.signOut()
+        saveIsNewFcmTokenAvailable(false)
+        saveFcmToken("")
         kotlinx.coroutines.delay(delay)
         afterDelay()
     }
@@ -199,6 +244,29 @@ class AppRepository @Inject constructor(
             ).startAfter(lastVisiblePostCount).limit(8).get()
         }
 
+    // (FIRESTORE) GET list of first 8 product
+    fun getFirstProductsByCategoryId(category_id: String): Flow<Resource<List<ProductModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("product")
+                .whereIn("category_id",listOf(category_id))
+                .orderBy("product_count", Query.Direction.DESCENDING)
+                .limit(8)
+                .get()
+        }
+
+    // (FIRESTORE) GET list of next 8 products
+    fun getNextProductsByCategoryId(lastVisiblePostCount: Int, category_id: String): Flow<Resource<List<ProductModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("product")
+                .whereIn("category_id",listOf(category_id))
+                .orderBy("product_count", Query.Direction.DESCENDING)
+                .startAfter(lastVisiblePostCount)
+                .limit(8)
+                .get()
+        }
+
     // (FIRESTORE) GET list of first 8 permintaan
     fun getFirstPermintaanWithNoFilter(): Flow<Resource<List<PermintaanModel>>?> =
         getResponse.getFirestoreListResponse {
@@ -213,6 +281,29 @@ class AppRepository @Inject constructor(
             firestoreDb.collection("permintaan").orderBy(
                 "permintaan_count", Query.Direction.DESCENDING
             ).startAfter(lastVisiblePermintaanCount).limit(8).get()
+        }
+
+    // (FIRESTORE) GET list of first 8 permintaan by category
+    fun getFirstPermintaanByCategoryId(category_id: String): Flow<Resource<List<PermintaanModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("permintaan")
+                .whereIn("category_id",listOf(category_id))
+                .orderBy("permintaan_count", Query.Direction.DESCENDING)
+                .limit(8)
+                .get()
+        }
+
+    // (FIRESTORE) GET list of next 8 permintaan by category
+    fun getNextPermintaanByCategoryId(lastVisiblePermintaanCount: Int, category_id:String): Flow<Resource<List<PermintaanModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("permintaan")
+                .whereIn("category_id",listOf(category_id))
+                .orderBy("permintaan_count", Query.Direction.DESCENDING)
+                .startAfter(lastVisiblePermintaanCount)
+                .limit(8)
+                .get()
         }
 
     // (FIRESTORE) GET list of MY first 8 product
@@ -583,5 +674,52 @@ class AppRepository @Inject constructor(
             .set(body)
             .addOnSuccessListener { onSuccess(body) }
             .addOnFailureListener { onFailed() }
+    }
+
+    // (FIRESTORE) SAVE fcm token to firestore
+    fun saveFcmTokenToFirestore(token: String) {
+        firestoreDb
+            .collection("fcm_token")
+            .document(getCurrentUid())
+            .set(
+                FcmTokenModel(
+                    uid = getCurrentUid(),
+                    token = token
+                )
+            )
+    }
+
+    // (FIRESTORE) GET fcm token by uid
+    fun getFcmTokenByUid(uid: String): Flow<Resource<FcmTokenModel>?> =
+        getResponse.getFirestoreResponse(timeDelay = 0L) {
+            firestoreDb
+                .collection("fcm_token")
+                .document(uid)
+                .get()
+        }
+
+    // (MESSAGING) SUBSCRIBE to target_uid
+    fun subscribeChatToTargetUid(target_uid: String) {
+        messaging.subscribeToTopic(target_uid)
+    }
+
+    // (MESSAGING) SEND notification
+    suspend fun sendCloudNotification(
+        my_name: String,
+        my_message: String,
+        target_token: String
+    ):Any? = httpClient.post {
+        val req = NotificationModel(
+            to = target_token,
+            data = Notification(
+                body = my_message,
+                title = my_name
+            )
+        )
+
+        url(FcmRoutes.fcmUrl)
+        contentType(ContentType.Application.Json)
+        header("Authorization", "Bearer ${FcmRoutes.fcmServerKey}")
+        body = req
     }
 }
