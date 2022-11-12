@@ -171,7 +171,7 @@ class AppRepository @Inject constructor(
         firestoreDb.collection(collection_name).document().id
 
     // (FIRESTORE) GET own userInfo
-    fun getOwnUserInfo(): Flow<Resource<UserModel>?> = getResponse.getFirestoreResponse {
+    fun getOwnUserInfo(delay: Long = 2500L): Flow<Resource<UserModel>?> = getResponse.getFirestoreResponse(timeDelay = delay) {
         firestoreDb.collection("user").document(auth.currentUser?.uid ?: "").get()
     }
 

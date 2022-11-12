@@ -236,7 +236,7 @@ private fun AddProductContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                placeHolderText = "Price",
+                placeHolderText = "Stock",
                 valueState = viewModel.stockState,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )

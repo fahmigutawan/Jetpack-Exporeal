@@ -66,7 +66,7 @@ fun BusinessRegisterScreen(navController: NavController) {
             topBar = {
                 AppTopBar(
                     onBackClicked = { navController.popBackStack() },
-                    title = "Pendaftaran Bisnis"
+                    title = "Business Registration"
                 )
             }
         ) {

@@ -380,9 +380,9 @@ enum class MarketTopMenuItem(
     val word: String
 ) {
     Produk(
-        "Produk"
+        "Product"
     ),
     Permintaan(
-        "Permintaan"
+        "Request"
     )
 }

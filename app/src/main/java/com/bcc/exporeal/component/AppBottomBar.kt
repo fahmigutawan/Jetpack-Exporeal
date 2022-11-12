@@ -138,7 +138,7 @@ enum class BottomBarItem(
         listOfRoute = listOf(AppNavRoute.PelatihanScreen.name),
         iconSelectedId = R.drawable.ic_botmenu_training_selected,
         iconUnselectedId = R.drawable.ic_botmenu_training_unselected,
-        word = "Pelatihan"
+        word = "Course"
     ),
     Profile(
         listOfRoute = listOf(AppNavRoute.ProfileScreen.name),

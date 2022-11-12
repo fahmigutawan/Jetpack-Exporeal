@@ -294,7 +294,7 @@ private fun ProfileContent(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         onClick = { viewModel.showPleaseRefreshSnackbar.value = true },
-                        text = "DAFTARKAN PERUSAHAAN",
+                        text = "REGISTER MY MUSINESS",
                         textColor = AppColor.Blue60,
                         backgroundColor = AppColor.Neutral10,
                         rippleColor = AppColor.Neutral100,
@@ -308,7 +308,7 @@ private fun ProfileContent(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         onClick = { viewModel.showIsLoadingSnackbar.value = true },
-                        text = "DAFTARKAN PERUSAHAAN",
+                        text = "REGISTER MY MUSINESS",
                         textColor = AppColor.Blue60,
                         backgroundColor = AppColor.Neutral10,
                         rippleColor = AppColor.Neutral100,
@@ -330,7 +330,7 @@ private fun ProfileContent(
                                         }
                                     }
                                 },
-                                text = "DAFTARKAN PERUSAHAAN",
+                                text = "REGISTER MY MUSINESS",
                                 textColor = AppColor.Blue60,
                                 backgroundColor = AppColor.Neutral10,
                                 rippleColor = AppColor.Neutral100,
@@ -351,7 +351,7 @@ private fun ProfileContent(
                                                 }
                                             }
                                         },
-                                        text = "DAFTARKAN PERUSAHAAN",
+                                        text = "REGISTER MY MUSINESS",
                                         textColor = AppColor.Blue60,
                                         backgroundColor = AppColor.Neutral10,
                                         rippleColor = AppColor.Neutral100,
@@ -371,7 +371,7 @@ private fun ProfileContent(
                                                 }
                                             }
                                         },
-                                        text = "DAFTARKAN PERUSAHAAN",
+                                        text = "REGISTER MY MUSINESS",
                                         textColor = AppColor.Blue60,
                                         backgroundColor = AppColor.Neutral10,
                                         rippleColor = AppColor.Neutral100,
@@ -391,7 +391,7 @@ private fun ProfileContent(
                                                 }
                                             }
                                         },
-                                        text = "DAFTARKAN PERUSAHAAN",
+                                        text = "REGISTER MY MUSINESS",
                                         textColor = AppColor.Blue60,
                                         backgroundColor = AppColor.Neutral10,
                                         rippleColor = AppColor.Neutral100,
@@ -438,7 +438,7 @@ private fun ProfileContent(
                             contentDescription = "Icon"
                         )
 
-                        AppText(text = "Akun", textType = TextType.Body1)
+                        AppText(text = "Account", textType = TextType.Body1)
                     }
                 }
 
@@ -464,7 +464,7 @@ private fun ProfileContent(
                                     contentDescription = "Icon"
                                 )
 
-                                AppText(text = "Perusahaan Saya", textType = TextType.Body1)
+                                AppText(text = "My Business", textType = TextType.Body1)
                             }
                         }
                     }
@@ -490,7 +490,7 @@ private fun ProfileContent(
                                 )
 
                                 AppText(
-                                    text = "Perusahaan Saya",
+                                    text = "My Business",
                                     textType = TextType.Body1,
                                     color = AppColor.Neutral50
                                 )
@@ -521,7 +521,7 @@ private fun ProfileContent(
                                         )
 
                                         AppText(
-                                            text = "Perusahaan Saya",
+                                            text = "My Business",
                                             textType = TextType.Body1,
                                             color = AppColor.Neutral50
                                         )
@@ -550,7 +550,7 @@ private fun ProfileContent(
                                             )
 
                                             AppText(
-                                                text = "Perusahaan Saya",
+                                                text = "My Business",
                                                 textType = TextType.Body1,
                                                 color = AppColor.Neutral50
                                             )
@@ -577,7 +577,7 @@ private fun ProfileContent(
                                             )
 
                                             AppText(
-                                                text = "Perusahaan Saya",
+                                                text = "My Business",
                                                 textType = TextType.Body1
                                             )
                                         }
@@ -608,7 +608,7 @@ private fun ProfileContent(
                                 )
 
                                 AppText(
-                                    text = "Perusahaan Saya",
+                                    text = "My Business",
                                     textType = TextType.Body1,
                                     color = AppColor.Neutral50
                                 )
@@ -637,7 +637,7 @@ private fun ProfileContent(
                             contentDescription = "Icon"
                         )
 
-                        AppText(text = "Riwayat Transaksi", textType = TextType.Body1)
+                        AppText(text = "Transaction History", textType = TextType.Body1)
                     }
                 }
             }
@@ -651,7 +651,7 @@ private fun ProfileContent(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                AppText(text = "Umum", textType = TextType.H3, color = AppColor.Neutral60)
+                AppText(text = "General", textType = TextType.H3, color = AppColor.Neutral60)
 
                 AppButton(
                     modifier = Modifier.fillMaxWidth(),
@@ -672,7 +672,7 @@ private fun ProfileContent(
                             contentDescription = "Icon"
                         )
 
-                        AppText(text = "Pengaturan", textType = TextType.Body1)
+                        AppText(text = "Settings", textType = TextType.Body1)
                     }
                 }
 
@@ -695,7 +695,7 @@ private fun ProfileContent(
                             contentDescription = "Icon"
                         )
 
-                        AppText(text = "Keamanan", textType = TextType.Body1)
+                        AppText(text = "Security", textType = TextType.Body1)
                     }
                 }
 
@@ -718,7 +718,7 @@ private fun ProfileContent(
                             contentDescription = "Icon"
                         )
 
-                        AppText(text = "Syarat & Ketentuan", textType = TextType.Body1)
+                        AppText(text = "Terms and Conditions", textType = TextType.Body1)
                     }
                 }
 
@@ -741,7 +741,7 @@ private fun ProfileContent(
                             contentDescription = "Icon"
                         )
 
-                        AppText(text = "Bantuan", textType = TextType.Body1)
+                        AppText(text = "Help", textType = TextType.Body1)
                     }
                 }
 
@@ -764,7 +764,7 @@ private fun ProfileContent(
                             contentDescription = "Icon"
                         )
 
-                        AppText(text = "Tentang", textType = TextType.Body1)
+                        AppText(text = "About", textType = TextType.Body1)
                     }
                 }
             }
@@ -801,7 +801,7 @@ private fun ProfileContent(
                         contentDescription = "Icon"
                     )
 
-                    AppText(text = "Keluar", textType = TextType.Body1, color = AppColor.Negative60)
+                    AppText(text = "Log out", textType = TextType.Body1, color = AppColor.Negative60)
                 }
             }
         }

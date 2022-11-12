@@ -45,15 +45,15 @@ fun RegisterScreen(navController: NavController) {
         }
     }
     SnackbarListener(
-        "Pastikan semua field telah terisi",
+        "Fill all fields before continue",
         viewModel.showFillAllFieldsSnackbar
     )
     SnackbarListener(
-        "Harap tunggu",
+        "Please wait",
         viewModel.showPleaseWaitSnackbar
     )
     SnackbarListener(
-        "Registrasi gagal, coba lagi nanti",
+        "Registration failed. Try again later",
         viewModel.showErrorSnackbar
     )
 
@@ -76,7 +76,7 @@ fun RegisterScreen(navController: NavController) {
                         ) {
                             Box(modifier = Modifier.padding(16.dp)) {
                                 AppTextButton(
-                                    text = "KEMBALI",
+                                    text = "BACK",
                                     textType = TextType.ButtonNormal,
                                     onClick = { viewModel.registerStep.value = 1 },
                                     color = AppColor.Blue60
@@ -122,10 +122,10 @@ private fun RegisterContent(
         item {
             Column {
                 AppText(
-                    text = "Buat akun", textType = TextType.H1
+                    text = "Create an account", textType = TextType.H1
                 )
                 AppText(
-                    text = "Daftarkan akun Anda untuk mengakses semua fitur dalam aplikasi",
+                    text = "Create an account to accress all features in this app",
                     textType = TextType.Body2
                 )
             }
@@ -152,7 +152,7 @@ private fun RegisterContent(
                     )
 
                     AppText(
-                        text = "Daftar dengan Google",
+                        text = "Continue with Google",
                         textType = TextType.Body1,
                         color = AppColor.Neutral100
                     )
@@ -163,7 +163,7 @@ private fun RegisterContent(
         // "Atau"
         item {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                AppText(text = "atau", textType = TextType.Body2, color = AppColor.Neutral50)
+                AppText(text = "or", textType = TextType.Body2, color = AppColor.Neutral50)
             }
         }
 
@@ -187,7 +187,7 @@ private fun RegisterContent(
                         }
                     }
                 },
-                text = "SELANJUTNYA"
+                text = "NEXT"
             )
         }
 
@@ -199,12 +199,12 @@ private fun RegisterContent(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     AppText(
-                        text = "Sudah punya akun?",
+                        text = "Already have an account?",
                         textType = TextType.Body2,
                         color = AppColor.Neutral50
                     )
                     AppTextButton(
-                        text = "Masuk",
+                        text = "Sign In",
                         textType = TextType.Body2Semibold,
                         color = AppColor.Blue60,
                         onClick = { navController.navigate(route = AppNavRoute.LoginScreen.name) }
@@ -242,10 +242,10 @@ private fun RegisterAdvanceContent(
         item {
             Column {
                 AppText(
-                    text = "Isi data diri", textType = TextType.H1
+                    text = "Fill in your personal data", textType = TextType.H1
                 )
                 AppText(
-                    text = "Satu langkah lagi! Isi data berikut untuk membuat akun",
+                    text = "One more step! Fill in the following data to create an account",
                     textType = TextType.Body2
                 )
             }
@@ -253,12 +253,12 @@ private fun RegisterAdvanceContent(
 
         // Nama field
         item {
-            AppTextInputField(placeHolderText = "Nama Lengkap", valueState = viewModel.fullNameState)
+            AppTextInputField(placeHolderText = "Full Name", valueState = viewModel.fullNameState)
         }
 
         // No HP field
         item {
-            AppTextInputField(placeHolderText = "Nomor HP", valueState = viewModel.mobileNumState)
+            AppTextInputField(placeHolderText = "Phone Number", valueState = viewModel.mobileNumState)
         }
 
         // Password field & SK
@@ -284,7 +284,7 @@ private fun RegisterAdvanceContent(
                     })
 
                 AppText(
-                    text = "Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Exporeal",
+                    text = "By continuing, you agree to Exporeal's Term on Service and Policies",
                     textType = TextType.Body3,
                     color = AppColor.Neutral50
                 )
@@ -337,7 +337,7 @@ private fun RegisterAdvanceContent(
                         }
                     }
                 },
-                text = "DAFTAR"
+                text = "SIGN UP"
             )
         }
     }

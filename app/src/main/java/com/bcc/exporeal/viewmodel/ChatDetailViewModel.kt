@@ -125,7 +125,7 @@ class ChatDetailViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.getOwnUserInfo().collect{
+            repository.getOwnUserInfo(0L).collect{
                 _user.value = it
             }
         }

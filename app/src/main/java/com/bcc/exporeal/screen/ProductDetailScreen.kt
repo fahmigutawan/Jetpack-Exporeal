@@ -389,7 +389,7 @@ private fun PermintaanDetailContent(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    AppText(text = "Deskripsi", textType = TextType.H4)
+                    AppText(text = "Description", textType = TextType.H4)
 
                     mainViewModel.pickedProductToProductDetailScreen.value?.let { product ->
                         Column {

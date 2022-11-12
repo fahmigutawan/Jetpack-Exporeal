@@ -224,7 +224,7 @@ private fun HomeContent(
 
         // Kategori title
         item {
-            AppText(text = "Kategori", textType = TextType.H3, color = AppColor.Neutral100)
+            AppText(text = "Category", textType = TextType.H3, color = AppColor.Neutral100)
         }
 
         // Kategory items
@@ -270,7 +270,7 @@ private fun HomeContent(
                                             highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                                             shape = RoundedCornerShape(4.dp)
                                         ),
-                                    text = "Catgegory",
+                                    text = "Category",
                                     textType = TextType.BottomMenu,
                                     color = AppColor.Blue60
                                 )
@@ -316,13 +316,13 @@ private fun HomeContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 AppText(
-                    text = "Produk pilihan",
+                    text = "Features Products",
                     textType = TextType.H3,
                     color = AppColor.Neutral100
                 )
 
                 AppTextButton(
-                    text = "Lihat semua",
+                    text = "Show All",
                     textType = TextType.Body3Semibold,
                     onClick = {
                         navController.navigate(route = "${AppNavRoute.MarketScreen.name}/tab=produk")
@@ -376,13 +376,13 @@ private fun HomeContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 AppText(
-                    text = "Permintaan terbaru",
+                    text = "Latest Requests",
                     textType = TextType.H3,
                     color = AppColor.Neutral100
                 )
 
                 AppTextButton(
-                    text = "Lihat semua",
+                    text = "Show All",
                     textType = TextType.Body3Semibold,
                     onClick = {
                         navController.navigate(route = "${AppNavRoute.MarketScreen.name}/tab=permintaan")

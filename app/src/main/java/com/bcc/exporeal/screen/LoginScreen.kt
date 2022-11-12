@@ -35,15 +35,15 @@ fun LoginScreen(navController: NavController) {
 
     /**Function*/
     SnackbarListener(
-        "Pastikan semua data telah terisi",
+        "Fill all fields before continue",
         viewModel.showFillAllFieldsSnackbar
     )
     SnackbarListener(
-        "Harap tunggu",
+        "Please wait",
         viewModel.showPleaseWaitSnackbar
     )
     SnackbarListener(
-        "Pastikan email anda terdaftar dan terhubung ke internet",
+        "Make sure all your data is correct and connected to internet",
         viewModel.showErrorSnackbar
     )
 
@@ -82,10 +82,10 @@ private fun LoginContent(
         item {
             Column {
                 AppText(
-                    text = "Selamat datang", textType = TextType.H1
+                    text = "Hi, Welcome", textType = TextType.H1
                 )
                 AppText(
-                    text = "Masuk ke akun Anda untuk melanjutkan",
+                    text = "Login to your account to continue",
                     textType = TextType.Body2
                 )
             }
@@ -112,7 +112,7 @@ private fun LoginContent(
                     )
 
                     AppText(
-                        text = "Masuk dengan Google",
+                        text = "Continue with Google",
                         textType = TextType.Body1,
                         color = AppColor.Neutral100
                     )
@@ -123,7 +123,7 @@ private fun LoginContent(
         // "Atau"
         item {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                AppText(text = "atau", textType = TextType.Body2, color = AppColor.Neutral50)
+                AppText(text = "or", textType = TextType.Body2, color = AppColor.Neutral50)
             }
         }
 
@@ -160,7 +160,7 @@ private fun LoginContent(
                     modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd
                 ) {
                     AppTextButton(
-                        text = "Lupa password?",
+                        text = "Forgot password?",
                         textType = TextType.Body2Semibold,
                         color = AppColor.Blue60,
                         onClick = { /*TODO*/ }
@@ -206,7 +206,7 @@ private fun LoginContent(
                         }
                     }
                 },
-                text = "MASUK"
+                text = "LOGIN"
             )
         }
 
@@ -218,12 +218,12 @@ private fun LoginContent(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     AppText(
-                        text = "Belum punya akun?",
+                        text = "Don't have an account?",
                         textType = TextType.Body2,
                         color = AppColor.Neutral50
                     )
                     AppTextButton(
-                        text = "Daftar",
+                        text = "Sign Up",
                         textType = TextType.Body2Semibold,
                         color = AppColor.Blue60,
                         onClick = { navController.navigate(route = AppNavRoute.RegisterScreen.name) }

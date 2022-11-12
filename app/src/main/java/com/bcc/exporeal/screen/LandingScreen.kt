@@ -36,14 +36,14 @@ fun LandingScreen(navController: NavController) {
     )
     val coroutineScope = rememberCoroutineScope()
     val landingTitles = listOf(
-        "Buat bisnismu mendunia!",
-        "Perkaya wawasan lewat fitur pelatihan",
-        "Daftarkan bisnismu sekarang"
+        "Let the world see your business!",
+        "Enrich you knowledge through our course!",
+        "Register your business now!"
     )
     val landingDescriptions = listOf(
-        "Jangkau pelangganmu di berbagai penjuuru dunia. Dengan ekspor, kamu dapat membuat produkmu menembus pasar dunia.",
-        "Belum paham mengenai ekspor? tidak perlu takut. Dengan fiotur pelatihan, kamu dapat belajar berbagai hal tentang ekspor.",
-        "Sudah siap memperluas dan mengembangkan bisnismu? Ayo daftarkan bisnismu sekarang juga."
+        "Reach your customers all over the world. You can make you products go international by exporting.",
+        "Didn't know anything about export? Don't worry, we are here. Course feature allows you to learn a lot of things about export.",
+        "Are you ready to expand and grow your business? What are you waiting for? Let's register your business now!."
     )
 
     /**Function*/
@@ -156,7 +156,7 @@ private fun LandingContent(
                                             }
                                         }
                                     })
-                                }, text = "AYO MULAI!"
+                                }, text = "GET STARTED!"
                             )
                         }
                         else -> {
@@ -183,7 +183,7 @@ private fun LandingContent(
                                     })
                                 }) {
                                     AppText(
-                                        text = "LEWATI",
+                                        text = "SKIP",
                                         textType = TextType.ButtonNormal,
                                         color = AppColor.Blue60
                                     )
@@ -193,7 +193,7 @@ private fun LandingContent(
                                     coroutineScope.launch {
                                         state.animateScrollToPage(state.currentPage + 1)
                                     }
-                                }, text = "LANJUT")
+                                }, text = "NEXT")
                             }
                         }
                     }

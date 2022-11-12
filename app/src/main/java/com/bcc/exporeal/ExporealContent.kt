@@ -114,7 +114,7 @@ fun ExporealContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f),
-                            placeHolderText = "Cari di Exporeal",
+                            placeHolderText = "Search in Exporeal",
                             valueState = mainViewModel.searchState,
                             endContent = {
                                 Icon(

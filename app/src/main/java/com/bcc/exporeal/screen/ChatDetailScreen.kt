@@ -38,6 +38,8 @@ import com.bcc.exporeal.viewmodel.ChatDetailViewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -52,6 +54,8 @@ fun ChatDetailScreen(
     val targetUser = viewModel.target_user.collectAsState()
     val user = viewModel.user.collectAsState()
     val density = LocalDensity.current
+    val swipeRefreshState =
+        rememberSwipeRefreshState(isRefreshing = viewModel.chatRoomSnapshot.value == null)
 
     /**Function*/
     LaunchedEffect(key1 = true) {
@@ -69,7 +73,6 @@ fun ChatDetailScreen(
     }
     if (!viewModel.isChatRoomCheckLoaded.value) {
         LaunchedEffect(key1 = true) {
-            Log.e("CALLED", "BRO")
             viewModel.getAvailableChatRoom(possibleChannel1 = "${viewModel.getCurrentUid()}-${target_uid}",
                 possibleChannel2 = "${target_uid}-${viewModel.getCurrentUid()}",
                 onSuccess = { shouldCreateNew, channel ->
@@ -174,9 +177,11 @@ fun ChatDetailScreen(
         },
         bottomBar = {
             Column {
-                Box(modifier = Modifier
-                    .heightIn(max = 250.dp)
-                    .background(AppColor.Neutral20)) {
+                Box(
+                    modifier = Modifier
+                        .heightIn(max = 250.dp)
+                        .background(AppColor.Neutral20)
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -204,7 +209,7 @@ fun ChatDetailScreen(
                                             onSuccess = {
                                                 // Send notification
                                                 val tmpChat = viewModel.chatInputState.value
-                                                viewModel.getTargetFcmToken(target_uid){ token ->
+                                                viewModel.getTargetFcmToken(target_uid) { token ->
                                                     viewModel.sendNotification(
                                                         my_name = user.value?.data?.name ?: "",
                                                         my_message = tmpChat,
@@ -226,7 +231,8 @@ fun ChatDetailScreen(
                                                             last_chat = viewModel.chatInputState.value,
                                                             onSuccess = {
                                                                 viewModel.withItem.value = ""
-                                                                viewModel.shouldCreateNew.value = false
+                                                                viewModel.shouldCreateNew.value =
+                                                                    false
                                                             },
                                                             onFailed = {
                                                                 /*TODO*/
@@ -253,7 +259,7 @@ fun ChatDetailScreen(
                                             onSuccess = {
                                                 // Send notification
                                                 val tmpChat = viewModel.chatInputState.value
-                                                viewModel.getTargetFcmToken(target_uid){ token ->
+                                                viewModel.getTargetFcmToken(target_uid) { token ->
                                                     viewModel.sendNotification(
                                                         my_name = user.value?.data?.name ?: "",
                                                         my_message = tmpChat,
@@ -293,12 +299,14 @@ fun ChatDetailScreen(
             }
         }
     ) {
-        ChatDetailContent(
-            navController = navController,
-            viewModel = viewModel,
-            targetUser = targetUser,
-            paddingValues = it
-        )
+        SwipeRefresh(state = swipeRefreshState, onRefresh = { /*TODO*/ }) {
+            ChatDetailContent(
+                navController = navController,
+                viewModel = viewModel,
+                targetUser = targetUser,
+                paddingValues = it
+            )
+        }
     }
 }
 
