@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bcc.exporeal.component.TextType.*
 import com.bcc.exporeal.ui.style.AppColor
@@ -26,7 +27,8 @@ fun AppText(
     modifier: Modifier = Modifier,
     text: String,
     textType: TextType,
-    color: Color = AppColor.Neutral100
+    color: Color = AppColor.Neutral100,
+    align:TextAlign = TextAlign.Start
 ) {
     Text(
         modifier = modifier,
@@ -49,7 +51,8 @@ fun AppText(
             BottomMenu -> AppType.bottomMenu()
             ButtonNormal -> AppType.buttonNormal()
             ButtonSmall -> AppType.buttonSmall()
-        }
+        },
+        textAlign = align
     )
 }
 

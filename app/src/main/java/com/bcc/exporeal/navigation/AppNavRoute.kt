@@ -16,5 +16,6 @@ enum class AppNavRoute {
     ChatListScreen,
     ChatDetailScreen,
     ProductOfMerchantScreen,
-    AddProductScreen
+    AddProductScreen,
+    OrderDetailScreen
 }

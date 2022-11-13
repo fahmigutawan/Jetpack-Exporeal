@@ -162,7 +162,7 @@ fun ExporealNavHost(
     mainViewModel: MainViewModel,
     modifier: Modifier,
     repository: AppRepository,
-    intent:Intent
+    intent: Intent
 ) {
     NavHost(
         modifier = modifier,
@@ -171,7 +171,11 @@ fun ExporealNavHost(
     ) {
         composable(route = AppNavRoute.MySplashScreen.name) {
             intent.getStringExtra("uid")?.let {
-                navController.navigate("${AppNavRoute.ChatDetailScreen.name}/$it")
+                navController.navigate("${AppNavRoute.ChatDetailScreen.name}/$it") {
+                    popUpTo(AppNavRoute.MySplashScreen.name) {
+                        inclusive = true
+                    }
+                }
             }
             MySplashScreen(navController = navController)
         }
@@ -330,6 +334,10 @@ fun ExporealNavHost(
 
         composable(route = AppNavRoute.AddProductScreen.name) {
             AddProductScreen(navController = navController)
+        }
+
+        composable(route = AppNavRoute.OrderDetailScreen.name) {
+            OrderDetailScreen(navController = navController, mainViewModel = mainViewModel)
         }
     }
 }

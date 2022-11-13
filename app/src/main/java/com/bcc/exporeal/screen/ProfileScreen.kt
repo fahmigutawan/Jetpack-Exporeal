@@ -617,6 +617,30 @@ private fun ProfileContent(
                     }
                 }
 
+                // Back account
+                AppButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { /*TODO*/ },
+                    backgroundColor = AppColor.Neutral10,
+                    rippleColor = AppColor.Neutral100,
+                    borderWidth = 1.dp,
+                    borderColor = AppColor.Neutral60
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        AsyncImage(
+                            modifier = Modifier.size(24.dp),
+                            model = R.drawable.ic_profile_bank,
+                            contentDescription = "Icon"
+                        )
+
+                        AppText(text = "Bank Account", textType = TextType.Body1)
+                    }
+                }
+
                 // Riwayat transaksi
                 AppButton(
                     modifier = Modifier.fillMaxWidth(),

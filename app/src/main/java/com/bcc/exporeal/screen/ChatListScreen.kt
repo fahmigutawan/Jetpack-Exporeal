@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.bcc.exporeal.R
 import com.bcc.exporeal.component.AppButton
 import com.bcc.exporeal.component.AppText
 import com.bcc.exporeal.component.AppTopBar
@@ -151,14 +152,25 @@ private fun ChatListContent(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                AsyncImage(
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(CircleShape),
-                                    contentScale = ContentScale.Crop,
-                                    model = it.profile_pic ?: "",
-                                    contentDescription = "Img"
-                                )
+                                if((it.profile_pic ?: "").isNotEmpty()){
+                                    AsyncImage(
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop,
+                                        model = it.profile_pic ?: "",
+                                        contentDescription = "Img"
+                                    )
+                                }else{
+                                    AsyncImage(
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop,
+                                        model = R.drawable.ic_profile_pic,
+                                        contentDescription = "Img"
+                                    )
+                                }
                                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                     AppText(text = it.name ?: "", textType = TextType.Body1Semibold)
                                     AppText(

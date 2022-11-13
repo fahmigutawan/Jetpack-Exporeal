@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -23,8 +24,8 @@ fun BusinessVerificationStatusLandingScreen(
 ) {
     val imgWidth = LocalConfiguration.current.screenWidthDp / 3
     ListenAppBackHandler {
-        navController.navigate(route = AppNavRoute.ProfileScreen.name){
-            popUpTo(route = AppNavRoute.BusinessRegistrationVerificationLandingScreen.name){
+        navController.navigate(route = AppNavRoute.ProfileScreen.name) {
+            popUpTo(route = AppNavRoute.BusinessRegistrationVerificationLandingScreen.name) {
                 inclusive = true
             }
         }
@@ -47,15 +48,16 @@ fun BusinessVerificationStatusLandingScreen(
                 contentDescription = "Business logo"
             )
 
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 AppText(text = "Your registration is in progress...", textType = TextType.H3)
             }
 
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 AppText(
                     text = "Please wait for a certain period of time while your document being verified by our team",
                     textType = TextType.Body2,
-                    color = AppColor.Neutral50
+                    color = AppColor.Neutral50,
+                    align = TextAlign.Center
                 )
             }
         }
@@ -63,8 +65,8 @@ fun BusinessVerificationStatusLandingScreen(
         AppButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                navController.navigate(route = AppNavRoute.ProfileScreen.name){
-                    popUpTo(route = AppNavRoute.BusinessRegistrationVerificationLandingScreen.name){
+                navController.navigate(route = AppNavRoute.ProfileScreen.name) {
+                    popUpTo(route = AppNavRoute.BusinessRegistrationVerificationLandingScreen.name) {
                         inclusive = true
                     }
                 }

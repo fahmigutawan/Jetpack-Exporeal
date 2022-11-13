@@ -8,10 +8,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,10 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.bcc.exporeal.R
-import com.bcc.exporeal.model.CategoryModel
-import com.bcc.exporeal.model.PermintaanModel
-import com.bcc.exporeal.model.ProductModel
-import com.bcc.exporeal.model.UserModel
+import com.bcc.exporeal.model.*
 import com.bcc.exporeal.navigation.AppNavRoute
 import com.bcc.exporeal.repository.AppRepository
 import com.bcc.exporeal.ui.style.AppColor
@@ -158,10 +155,7 @@ fun ProductItemLoading() {
                         color = AppColor.Neutral50,
                         highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                         shape = RoundedCornerShape(4.dp)
-                    ),
-                text = "Rp25000",
-                textType = TextType.Body3,
-                color = AppColor.Warning60
+                    ), text = "Rp25000", textType = TextType.Body3, color = AppColor.Warning60
             )
         }
 
@@ -501,10 +495,7 @@ fun PermintaanItemLoading() {
                             color = AppColor.Neutral50,
                             highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                             shape = RoundedCornerShape(4.dp)
-                        ),
-                        text = "Username",
-                        textType = TextType.Body3,
-                        color = AppColor.Neutral60
+                        ), text = "Username", textType = TextType.Body3, color = AppColor.Neutral60
                     )
                 }
             }
@@ -602,8 +593,7 @@ fun PermintaanItemLoading() {
 
 @Composable
 fun AddProductImagePicker(
-    onClick: () -> Unit,
-    size: Dp
+    onClick: () -> Unit, size: Dp
 ) {
     Box(
         modifier = Modifier
@@ -611,17 +601,14 @@ fun AddProductImagePicker(
             .clip(RoundedCornerShape(8.dp))
             .background(AppColor.Blue20)
             .border(shape = RoundedCornerShape(8.dp), color = AppColor.Blue60, width = 1.dp)
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
+            .clickable { onClick() }, contentAlignment = Alignment.Center
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
-                tint = AppColor.Blue60
+                imageVector = Icons.Default.Add, contentDescription = "Add", tint = AppColor.Blue60
             )
 
             AppText(text = "Add Photo", textType = TextType.Body3, color = AppColor.Blue60)
@@ -631,16 +618,13 @@ fun AddProductImagePicker(
 
 @Composable
 fun AddProductImagePreview(
-    imgUri: Uri,
-    onDeleteClicked: () -> Unit,
-    size: Dp
+    imgUri: Uri, onDeleteClicked: () -> Unit, size: Dp
 ) {
     Box(
         modifier = Modifier
             .size(size)
             .clip(RoundedCornerShape(8.dp))
-            .background(AppColor.Neutral100),
-        contentAlignment = Alignment.BottomEnd
+            .background(AppColor.Neutral100), contentAlignment = Alignment.BottomEnd
     ) {
         AsyncImage(
             modifier = Modifier
@@ -651,10 +635,9 @@ fun AddProductImagePreview(
         )
 
         Icon(
-            modifier = Modifier
-                .clickable {
-                    onDeleteClicked()
-                },
+            modifier = Modifier.clickable {
+                onDeleteClicked()
+            },
             imageVector = Icons.Default.Delete,
             contentDescription = "Delete",
             tint = AppColor.Negative60
@@ -674,14 +657,11 @@ fun ChatProductItem(
     val imgSize = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-    if(product.value == null){
+    if (product.value == null) {
         LaunchedEffect(key1 = true) {
-            viewModel.getProductByProductId(
-                product_id = product_id,
-                onSuccess = {
-                    product.value = it
-                }
-            )
+            viewModel.getProductByProductId(product_id = product_id, onSuccess = {
+                product.value = it
+            })
         }
     }
 
@@ -723,8 +703,7 @@ fun ChatProductItem(
                                 with(density) {
                                     imgSize.value = it.height.toDp()
                                 }
-                            },
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            }, verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             // Name
                             AppText(
@@ -733,9 +712,7 @@ fun ChatProductItem(
                                     color = AppColor.Neutral50,
                                     highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                                     shape = RoundedCornerShape(4.dp)
-                                ),
-                                text = "Product name",
-                                textType = TextType.Body3
+                                ), text = "Product name", textType = TextType.Body3
                             )
 
                             // Stock
@@ -745,9 +722,7 @@ fun ChatProductItem(
                                     color = AppColor.Neutral50,
                                     highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                                     shape = RoundedCornerShape(4.dp)
-                                ),
-                                text = "Stock",
-                                textType = TextType.Body3
+                                ), text = "Stock", textType = TextType.Body3
                             )
 
                             // Price
@@ -757,9 +732,7 @@ fun ChatProductItem(
                                     color = AppColor.Neutral50,
                                     highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                                     shape = RoundedCornerShape(4.dp)
-                                ),
-                                text = "Product price",
-                                textType = TextType.Body3
+                                ), text = "Product price", textType = TextType.Body3
                             )
                         }
                     }
@@ -807,8 +780,7 @@ fun ChatProductItem(
                                 with(density) {
                                     imgSize.value = it.height.toDp()
                                 }
-                            },
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            }, verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             // Name
                             AppText(
@@ -833,16 +805,13 @@ fun ChatProductItem(
 
                     // Open btn
                     AppButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            mainViewModel.pickedProductToProductDetailScreen.value =
-                                product.value
+                        modifier = Modifier.fillMaxWidth(), onClick = {
+                            mainViewModel.pickedProductToProductDetailScreen.value = product.value
 
                             if (mainViewModel.pickedProductToProductDetailScreen.value != null) {
                                 navController.navigate(route = AppNavRoute.ProductDetailScreen.name)
                             }
-                        },
-                        text = "OPEN PRODUCT"
+                        }, text = "OPEN PRODUCT"
                     )
                 }
             }
@@ -862,14 +831,11 @@ fun ChatPermintaanItem(
     val imgSize = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-    if(permintaan.value == null){
+    if (permintaan.value == null) {
         LaunchedEffect(key1 = true) {
-            viewModel.getPermintaanByPermintaanId(
-                permintaan_id = permintaan_id,
-                onSuccess = {
-                    permintaan.value = it
-                }
-            )
+            viewModel.getPermintaanByPermintaanId(permintaan_id = permintaan_id, onSuccess = {
+                permintaan.value = it
+            })
         }
     }
 
@@ -911,8 +877,7 @@ fun ChatPermintaanItem(
                                 with(density) {
                                     imgSize.value = it.height.toDp()
                                 }
-                            },
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            }, verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             // Name
                             AppText(
@@ -921,9 +886,7 @@ fun ChatPermintaanItem(
                                     color = AppColor.Neutral50,
                                     highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                                     shape = RoundedCornerShape(4.dp)
-                                ),
-                                text = "Product name",
-                                textType = TextType.Body3
+                                ), text = "Product name", textType = TextType.Body3
                             )
 
                             // Stock
@@ -933,9 +896,7 @@ fun ChatPermintaanItem(
                                     color = AppColor.Neutral50,
                                     highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                                     shape = RoundedCornerShape(4.dp)
-                                ),
-                                text = "Stock",
-                                textType = TextType.Body3
+                                ), text = "Stock", textType = TextType.Body3
                             )
 
                             // Price
@@ -945,18 +906,14 @@ fun ChatPermintaanItem(
                                     color = AppColor.Neutral50,
                                     highlight = PlaceholderHighlight.shimmer(highlightColor = AppColor.Neutral20),
                                     shape = RoundedCornerShape(4.dp)
-                                ),
-                                text = "Product price",
-                                textType = TextType.Body3
+                                ), text = "Product price", textType = TextType.Body3
                             )
                         }
                     }
 
                     // Open btn
                     AppButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { },
-                        text = "OPEN PRODUCT"
+                        modifier = Modifier.fillMaxWidth(), onClick = { }, text = "OPEN PRODUCT"
                     )
                 }
             }
@@ -995,8 +952,7 @@ fun ChatPermintaanItem(
                                 with(density) {
                                     imgSize.value = it.height.toDp()
                                 }
-                            },
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            }, verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             // Name
                             AppText(
@@ -1021,16 +977,103 @@ fun ChatPermintaanItem(
 
                     // Open btn
                     AppButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
+                        modifier = Modifier.fillMaxWidth(), onClick = {
                             mainViewModel.pickedPermintaanToPermintaanDetailScreen.value =
                                 permintaan.value
 
                             if (mainViewModel.pickedPermintaanToPermintaanDetailScreen.value != null) {
                                 navController.navigate(route = AppNavRoute.PermintaanDetailScreen.name)
                             }
-                        },
-                        text = "OPEN PRODUCT"
+                        }, text = "OPEN PRODUCT"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AddressItem(
+    modifier: Modifier = Modifier,
+    onChooseAnotherClicked: () -> Unit,
+    address: AddressModel?
+) {
+    val dividerWidth = remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+
+    Box(
+        modifier = modifier
+            .background(AppColor.Neutral10)
+            .onSizeChanged {
+                with(density) {
+                    dividerWidth.value = it.width.toDp()
+                }
+            }
+    ) {
+        Column {
+            // Address section
+            Row(
+                modifier = Modifier.padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Location",
+                    tint = AppColor.Blue60
+                )
+
+                // Address item
+                Column {
+                    // Title
+                    AppText(text = "Delivery Address", textType = TextType.Body2Semibold)
+
+                    // Address text
+                    when (address) {
+                        null -> {
+                            AppText(
+                                text = "Address has not chosen yet",
+                                textType = TextType.Body3,
+                                color = AppColor.Negative60
+                            )
+                        }
+
+                        else -> {
+                            AppText(
+                                text = address.address ?: "",
+                                textType = TextType.Body3
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Divider
+            Box(
+                modifier = Modifier
+                    .height(1.dp)
+                    .width(dividerWidth.value)
+                    .background(AppColor.Neutral60)
+            )
+
+            // Btn
+            Box(modifier = Modifier.clickable { onChooseAnotherClicked() }) {
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .width(dividerWidth.value),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    AppText(
+                        text = "Choose Another Address",
+                        textType = TextType.Body3Semibold,
+                        color = AppColor.Blue60
+                    )
+
+                    Icon(
+                        imageVector = Icons.Default.NavigateNext,
+                        contentDescription = "Icon",
+                        tint = AppColor.Neutral60
                     )
                 }
             }

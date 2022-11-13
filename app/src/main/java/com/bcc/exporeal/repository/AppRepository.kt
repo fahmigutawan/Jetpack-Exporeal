@@ -167,9 +167,10 @@ class AppRepository @Inject constructor(
         firestoreDb.collection(collection_name).document().id
 
     // (FIRESTORE) GET own userInfo
-    fun getOwnUserInfo(delay: Long = 2500L): Flow<Resource<UserModel>?> = getResponse.getFirestoreResponse(timeDelay = delay) {
-        firestoreDb.collection("user").document(auth.currentUser?.uid ?: "").get()
-    }
+    fun getOwnUserInfo(delay: Long = 2500L): Flow<Resource<UserModel>?> =
+        getResponse.getFirestoreResponse(timeDelay = delay) {
+            firestoreDb.collection("user").document(auth.currentUser?.uid ?: "").get()
+        }
 
     // (FIRESTORE) GET userInfo by UID
     fun getUserInfoByUid(uid: String, delay: Long = 2500L): Flow<Resource<UserModel>?> =
@@ -245,18 +246,21 @@ class AppRepository @Inject constructor(
         getResponse.getFirestoreListResponse {
             firestoreDb
                 .collection("product")
-                .whereIn("category_id",listOf(category_id))
+                .whereIn("category_id", listOf(category_id))
                 .orderBy("product_count", Query.Direction.DESCENDING)
                 .limit(8)
                 .get()
         }
 
     // (FIRESTORE) GET list of next 8 products
-    fun getNextProductsByCategoryId(lastVisiblePostCount: Int, category_id: String): Flow<Resource<List<ProductModel>>?> =
+    fun getNextProductsByCategoryId(
+        lastVisiblePostCount: Int,
+        category_id: String
+    ): Flow<Resource<List<ProductModel>>?> =
         getResponse.getFirestoreListResponse {
             firestoreDb
                 .collection("product")
-                .whereIn("category_id",listOf(category_id))
+                .whereIn("category_id", listOf(category_id))
                 .orderBy("product_count", Query.Direction.DESCENDING)
                 .startAfter(lastVisiblePostCount)
                 .limit(8)
@@ -284,18 +288,21 @@ class AppRepository @Inject constructor(
         getResponse.getFirestoreListResponse {
             firestoreDb
                 .collection("permintaan")
-                .whereIn("category_id",listOf(category_id))
+                .whereIn("category_id", listOf(category_id))
                 .orderBy("permintaan_count", Query.Direction.DESCENDING)
                 .limit(8)
                 .get()
         }
 
     // (FIRESTORE) GET list of next 8 permintaan by category
-    fun getNextPermintaanByCategoryId(lastVisiblePermintaanCount: Int, category_id:String): Flow<Resource<List<PermintaanModel>>?> =
+    fun getNextPermintaanByCategoryId(
+        lastVisiblePermintaanCount: Int,
+        category_id: String
+    ): Flow<Resource<List<PermintaanModel>>?> =
         getResponse.getFirestoreListResponse {
             firestoreDb
                 .collection("permintaan")
-                .whereIn("category_id",listOf(category_id))
+                .whereIn("category_id", listOf(category_id))
                 .orderBy("permintaan_count", Query.Direction.DESCENDING)
                 .startAfter(lastVisiblePermintaanCount)
                 .limit(8)
@@ -706,7 +713,7 @@ class AppRepository @Inject constructor(
         my_name: String,
         my_message: String,
         target_token: String
-    ):Any? = httpClient.post {
+    ): Any? = httpClient.post {
         val req = NotificationModel(
             to = target_token,
             data = Notification(
@@ -723,14 +730,46 @@ class AppRepository @Inject constructor(
     }
 
     // (FIRESTORE) GET product by product_id
-    fun getProductByProductId(product_id: String, delay: Long = 2500L):Flow<Resource<ProductModel>?> =
+    fun getProductByProductId(
+        product_id: String,
+        delay: Long = 2500L
+    ): Flow<Resource<ProductModel>?> =
         getResponse.getFirestoreResponse(timeDelay = delay) {
             firestoreDb.collection("product").document(product_id).get()
         }
 
     // (FIRESTORE) GET permintaan by permintaan_id
-    fun getPermintaanByPermintaanId(permintaan_id: String, delay: Long = 2500L):Flow<Resource<PermintaanModel>?> =
+    fun getPermintaanByPermintaanId(
+        permintaan_id: String,
+        delay: Long = 2500L
+    ): Flow<Resource<PermintaanModel>?> =
         getResponse.getFirestoreResponse(timeDelay = delay) {
             firestoreDb.collection("permintaan").document(permintaan_id).get()
+        }
+
+    // (FIRESTORE) SAVE address to firestore
+    fun saveAddress(address: String, onSuccess: (AddressModel) -> Unit, onFailed: () -> Unit) {
+        val randomKey = getRandomKey("address")
+        val req = AddressModel(
+            address_id = randomKey,
+            uid = getCurrentUid(),
+            address = address
+        )
+
+        firestoreDb
+            .collection("address")
+            .document(randomKey)
+            .set(req)
+            .addOnSuccessListener { onSuccess(req) }
+            .addOnFailureListener { onFailed() }
+    }
+
+    // (FIRESTORE) GET address from firestore by uid
+    fun getAddresses(): Flow<Resource<List<AddressModel>>?> =
+        getResponse.getFirestoreListResponse {
+            firestoreDb
+                .collection("address")
+                .whereIn("uid", listOf(getCurrentUid()))
+                .get()
         }
 }

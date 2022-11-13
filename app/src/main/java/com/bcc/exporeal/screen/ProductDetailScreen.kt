@@ -136,7 +136,9 @@ fun ProductDetailScreen(
 
                     AppButton(
                         modifier = Modifier.fillMaxSize(),
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            navController.navigate(route = AppNavRoute.OrderDetailScreen.name)
+                        },
                         text = "ORDER NOW"
                     )
                 }
@@ -543,14 +545,29 @@ private fun PermintaanDetailContent(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                AsyncImage(
-                                    modifier = Modifier
-                                        .size(64.dp)
-                                        .clip(CircleShape),
-                                    contentScale = ContentScale.Crop,
-                                    model = merchant.value?.data?.profile_pic ?: "",
-                                    contentDescription = "Profile pic"
-                                )
+                                when (merchant.value?.data?.profile_pic ?: "") {
+                                    "" -> {
+                                        AsyncImage(
+                                            modifier = Modifier
+                                                .size(64.dp)
+                                                .clip(CircleShape),
+                                            contentScale = ContentScale.Crop,
+                                            model = R.drawable.ic_profile_pic,
+                                            contentDescription = "Profile pic"
+                                        )
+                                    }
+
+                                    else -> {
+                                        AsyncImage(
+                                            modifier = Modifier
+                                                .size(64.dp)
+                                                .clip(CircleShape),
+                                            contentScale = ContentScale.Crop,
+                                            model = merchant.value?.data?.profile_pic ?: "",
+                                            contentDescription = "Profile pic"
+                                        )
+                                    }
+                                }
 
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     AppText(
@@ -558,18 +575,34 @@ private fun PermintaanDetailContent(
                                         textType = TextType.Body1Semibold
                                     )
 
-                                    AsyncImage(
-                                        modifier = Modifier
-                                            .height(34.dp)
-                                            .clip(RoundedCornerShape(4.dp))
-                                            .border(
-                                                width = 1.dp,
-                                                shape = RoundedCornerShape(4.dp),
-                                                color = AppColor.Neutral30
-                                            ),
-                                        model = "https://flagcdn.com/h40/${merchant.value?.data?.country_id ?: ""}.png",
-                                        contentDescription = "Flag"
-                                    )
+                                    if (merchant.value?.data?.country_id != null) {
+                                        AsyncImage(
+                                            modifier = Modifier
+                                                .height(34.dp)
+                                                .clip(RoundedCornerShape(4.dp))
+                                                .border(
+                                                    width = 1.dp,
+                                                    shape = RoundedCornerShape(4.dp),
+                                                    color = AppColor.Neutral30
+                                                ),
+                                            model = "https://flagcdn.com/h40/${merchant.value?.data?.country_id ?: ""}.png",
+                                            contentDescription = "Flag"
+                                        )
+                                    } else {
+                                        AsyncImage(
+                                            modifier = Modifier
+                                                .height(34.dp)
+                                                .width(51.dp)
+                                                .clip(RoundedCornerShape(4.dp))
+                                                .border(
+                                                    width = 1.dp,
+                                                    shape = RoundedCornerShape(4.dp),
+                                                    color = AppColor.Neutral30
+                                                ),
+                                            model = R.drawable.ic_baseline_rectangle_24,
+                                            contentDescription = "Flag"
+                                        )
+                                    }
                                 }
                             }
                         }

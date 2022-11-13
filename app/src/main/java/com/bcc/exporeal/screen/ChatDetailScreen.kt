@@ -150,14 +150,25 @@ fun ChatDetailScreen(
                             )
                         }
                         is Resource.Success -> {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .size(imgSize.value)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop,
-                                model = targetUser.value?.data?.profile_pic ?: "",
-                                contentDescription = "Img"
-                            )
+                            if((targetUser.value?.data?.profile_pic ?: "").isNotEmpty()){
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .size(imgSize.value)
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop,
+                                    model = targetUser.value?.data?.profile_pic ?: "",
+                                    contentDescription = "Img"
+                                )
+                            }else{
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .size(imgSize.value)
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop,
+                                    model = R.drawable.ic_profile_pic,
+                                    contentDescription = "Img"
+                                )
+                            }
                         }
                         null -> {}
                     }
