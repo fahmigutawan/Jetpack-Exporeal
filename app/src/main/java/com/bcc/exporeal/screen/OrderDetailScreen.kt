@@ -97,37 +97,39 @@ fun OrderDetailScreen(
             )
         },
         bottomBar = {
-            BottomAppBar(backgroundColor = AppColor.Neutral10, elevation = 10.dp) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        AppText(text = "Total", textType = TextType.Body3)
-                        AppText(
-                            text = ((viewModel.subTotalDelivery.value + viewModel.subTotalProduct.value).toString()),
-                            textType = TextType.Body2Semibold,
-                            color = AppColor.Warning60
+            if(viewModel.orderDetailScreenState.value == Main){
+                BottomAppBar(backgroundColor = AppColor.Neutral10, elevation = 10.dp) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            AppText(text = "Total", textType = TextType.Body3)
+                            AppText(
+                                text = ((viewModel.subTotalDelivery.value + viewModel.subTotalProduct.value).toString()),
+                                textType = TextType.Body2Semibold,
+                                color = AppColor.Warning60
+                            )
+                        }
+
+                        AppButton(
+                            onClick = {
+                                viewModel.apply {
+                                    if (pickedAddress.value == null) {
+                                        snackbarMessage.value = "Choose delivery address"
+                                        showSnackbar.value = true
+                                        return@apply
+                                    }
+
+                                    /*TODO*/
+                                }
+                            },
+                            text = "ORDER"
                         )
                     }
-
-                    AppButton(
-                        onClick = {
-                            viewModel.apply {
-                                if (pickedAddress.value == null) {
-                                    snackbarMessage.value = "Choose delivery address"
-                                    showSnackbar.value = true
-                                    return@apply
-                                }
-
-                                /*TODO*/
-                            }
-                        },
-                        text = "ORDER"
-                    )
                 }
             }
         }
@@ -514,7 +516,7 @@ private fun OrderDetailContent(
 
                     // Paypal (DUMMY)
                     AsyncImage(
-                        modifier = Modifier.height(64.dp),
+                        modifier = Modifier.height(42.dp),
                         model = R.drawable.ic_paypal,
                         contentDescription = "paypal"
                     )

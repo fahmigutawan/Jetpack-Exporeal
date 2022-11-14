@@ -12,6 +12,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.bcc.exporeal.model.*
 import com.bcc.exporeal.util.FcmCred
 import com.bcc.exporeal.util.GetResponse
+import com.bcc.exporeal.util.ImageCompressor
 import com.bcc.exporeal.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -29,7 +30,7 @@ import javax.inject.Inject
 val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class AppRepository @Inject constructor(
-    context: Context,
+    private val context: Context,
     private val realtimeDb: FirebaseDatabase,
     private val firestoreDb: FirebaseFirestore,
     private val storage: FirebaseStorage,
@@ -140,13 +141,18 @@ class AppRepository @Inject constructor(
         onFailed: () -> Unit,
         onProgress: (transferred: Long, total: Long) -> Unit
     ) {
+        val compressed = ImageCompressor.compress(
+            context = context,
+            uri = uri,
+            quality = 30
+        )
         // Save to storage
-        storage.reference.child("profile_pic/${auth.currentUser?.uid}.png").putFile(uri)
+        storage.reference.child("profile_pic/${auth.currentUser?.uid}.jpeg").putBytes(compressed)
             .addOnProgressListener {
                 onProgress(it.bytesTransferred, it.totalByteCount)
             }.addOnSuccessListener {
                 // Get image URL
-                storage.reference.child("profile_pic/${auth.currentUser?.uid}.png").downloadUrl.addOnSuccessListener {
+                it.storage.downloadUrl.addOnSuccessListener {
                     // Save to firestore
                     firestoreDb.collection("user").document(auth.currentUser?.uid ?: "").set(
                         user.copy(
@@ -586,8 +592,8 @@ class AppRepository @Inject constructor(
         listUri.forEachIndexed { index, uri ->
             storage
                 .reference
-                .child("product_images/${index}-${product_id}.png")
-                .putFile(uri)
+                .child("product_images/${index}-${product_id}.jpeg")
+                .putBytes(ImageCompressor.compress(context, uri, quality = 30))
                 .addOnSuccessListener {
                     it.storage
                         .downloadUrl
